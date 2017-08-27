@@ -10,3 +10,5 @@ main :: IO ()
 main = case parse expr "" "^xyz.``xz`yz" of
             Left  parseError -> putStrLn . show $ parseError
             Right parsedExpr -> putStrLn . show $ parsedExpr
+
+skk = parse expr "" "``skk"
