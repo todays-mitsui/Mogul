@@ -54,3 +54,6 @@ goRoot :: ExprFocus -> ExprFocus
 goRoot focus = case goUp focus of
                     Nothing     -> focus
                     Just focus' -> goRoot focus'
+
+getRootExpr focus = let (e, _, _) = goRoot focus
+                    in  e

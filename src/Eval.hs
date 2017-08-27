@@ -12,11 +12,18 @@ import Focus
 
 
 evals :: Context -> Expr -> [Expr]
-evals = undefined
+evals context e = evals' [] context (e, 0, [])
+
+evals' :: [Expr] -> Context -> ExprFocus -> [Expr]
+evals' acc context focus =
+  case eval context focus of
+    Just focus' -> evals' (getRootExpr focus' : acc) context focus'
+    Nothing     -> acc
 
 eval :: Context -> ExprFocus -> Maybe ExprFocus
 eval context   (Var _         , _    , _  ) = Nothing
-eval context   (_ :^ _        , _    , _  ) = Nothing
+eval context   (_ :^ _        , 0    , _  ) = Nothing
+eval context f@(_ :^ _        , depth, _  ) = eval context =<< goUp f
 -- eval context   (_, 1, _) = Just (Var (Ident "D1"), 555, [])
 -- eval context   (_, 2, _) = Just (Var (Ident "D2"), 555, [])
 -- eval context   (_, 3, _) = Just (Var (Ident "D3"), 555, [])
@@ -54,3 +61,10 @@ getAlias context v
   | v `Map.member` context = let f = context ! v
                              in  Just $ alias f
   | otherwise              = Nothing
+
+apply :: Ident -> Expr -> Expr -> Expr
+apply v (Var w) e
+  | v == w    = e
+  | otherwise = Var w
+apply v (v' :^ e)  e' = v' :^ apply v e e'
+apply v (e' :$ e'') e = apply v e' e :$ apply v e'' e
