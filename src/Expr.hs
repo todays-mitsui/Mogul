@@ -111,3 +111,5 @@ compile context x@(Var v)
   | otherwise               = x
 compile context l@(_ :^ _)  = compile context $ unlambda l
 compile context (e :$ e')   = compile context e :$ compile context e'
+
+--------------------------------------------------------------------------------

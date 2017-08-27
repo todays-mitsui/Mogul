@@ -6,7 +6,6 @@ module Parser (
   lineComment
 ) where
 
-
 import Control.Monad (void)
 import Control.Applicative hiding ((<|>), many)
 import qualified Data.Map.Lazy as Map

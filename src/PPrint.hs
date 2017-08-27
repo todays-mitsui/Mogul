@@ -7,6 +7,7 @@ module PPrint (pp) where
 import Data.Monoid ((<>))
 import qualified Data.ByteString.Char8 as BS
 import Data.ByteString.Char8 (ByteString, unpack)
+import Data.Map.Lazy (foldrWithKey)
 
 import Expr
 
@@ -27,6 +28,9 @@ instance PPrintable Function where
 instance PPrintable (Ident, Function) where
   prepara (v, f) = symbol v : Equal : prepara f
 
+instance PPrintable Context where
+  prepara = foldrWithKey (\v f done -> prepara (v, f) <> (EOL : done)) []
+
 --------------------------------------------------------------------------------
 
 data Phrase = Backquote                 -- "`"
@@ -35,6 +39,7 @@ data Phrase = Backquote                 -- "`"
               | Equal                   -- "="
               | Symbol ByteString       -- 英小文字1文字からなるシンボル
               | LargeSymbol ByteString  -- 英数字2文字以上からなるシンボル
+              | EOL                     -- 行端
               deriving (Eq, Show)
 
 --------------------------------------------------------------------------------
@@ -74,3 +79,4 @@ byteStringShow Dot             = "."
 byteStringShow Equal           = "="
 byteStringShow (Symbol s)      = s
 byteStringShow (LargeSymbol s) = s
+byteStringShow EOL             = "\n"

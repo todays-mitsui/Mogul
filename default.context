@@ -1,0 +1,182 @@
+`ix = x
+``kxy = x
+```sxyz = ``xz`yz
+
+# Output の終端
+
+EOF = 256
+
+# 論理演算
+
+TRUE  = ^xy.x
+FALSE = ^xy.y
+IF    = ^BOOL THEN ELSE.``BOOL THEN ELSE
+
+NOT = ^x.``xFALSE TRUE
+AND = ^xy.``xyFALSE
+OR  = ^xy.``xTRUEy
+XOR = ^xy.``x`NOTyy
+
+# リスト
+
+CONS = ^xyf.``fxy
+CAR  = ^x.`xTRUE
+CDR  = ^x.`xFALSE
+
+NIL   = FALSE
+ISNIL = ^x.``x^_.FALSE TRUE
+
+# 不動点コンビネータ
+
+Y = ^f.`^x.`f`xx^x.`f`xx
+
+# チャーチ数
+
+ISZERO = ^n.``n^_.FALSE TRUE
+
+SUCC = ^n.^fx.`f``nfx             # 後者関数
+
+PLUS = ^mn.^fx.``mf``nfx
+MULT = ^mn.^f.`m`nf
+POW  = ^mn.`nm
+
+PRED = ^nfx.```n^gh.`h`gf^u.x^u.u # 前者関数
+SUB  = ^mn.``nPREDm
+
+GTE = ^mn.`ISZERO``SUBnm
+LTE = ^mn.`ISZERO``SUBmn
+
+EQ = ^mn.``AND``GTEmn``LTEmn
+
+
+0   = ^fx.x
+1   = ^fx.`fx
+2   = ^fx.`f`fx
+3   = ^fx.`f`f`fx
+4   = ```sii2             # 2^2 -> 4
+5   = ^fx.`f`f`f`f`fx
+6   = ``MULT 2  3
+7   = ^fx.`f`f`f`f`f`f`fx
+8   = `3 2                # 2^3 -> 8
+9   = `2 3                # 3^2 -> 9
+10  = ``MULT 2  5
+11  = ``PLUS 10 1
+12  = ``PLUS 10 2
+13  = ``PLUS 10 3
+14  = ``PLUS 10 4
+15  = ``PLUS 10 5
+16  = ``PLUS 10 6
+17  = ``PLUS 10 7
+18  = ``PLUS 10 7
+19  = ``PLUS 10 7
+20  = ``MULT 2  10
+21  = ``PLUS 20 1
+22  = ``PLUS 20 2
+23  = ``PLUS 20 3
+24  = ``PLUS 20 4
+25  = ``PLUS 20 5
+26  = ``PLUS 20 6
+27  = ``PLUS 20 7
+28  = ``PLUS 20 8
+29  = ``PLUS 20 9
+30  = ``MULT 3  10
+31  = ``PLUS 30 1
+32  = ``PLUS 30 2
+33  = ``PLUS 30 3   # !
+34  = ``PLUS 30 4   # "
+35  = ``PLUS 30 5   # #
+36  = ``PLUS 30 6   # $
+37  = ``PLUS 30 7   # %
+38  = ``PLUS 30 8   # &
+39  = ``PLUS 30 9   # '
+40  = ``MULT 4  10  # (
+41  = ``PLUS 40 1   # )
+42  = ``PLUS 40 2   # *
+43  = ``PLUS 40 3   # +
+44  = ``PLUS 40 4   # ,
+45  = ``PLUS 40 5   # -
+46  = ``PLUS 40 6   # .
+47  = ``PLUS 40 7   # /
+48  = ``PLUS 40 8   # 0
+49  = ``PLUS 40 9   # 1
+50  = ``MULT 5  10  # 2
+51  = ``PLUS 50 1   # 3
+52  = ``PLUS 50 2   # 4
+53  = ``PLUS 50 3   # 5
+54  = ``PLUS 50 4   # 6
+55  = ``PLUS 50 5   # 7
+56  = ``PLUS 50 6   # 8
+57  = ``PLUS 50 7   # 9
+58  = ``PLUS 50 8   # :
+59  = ``PLUS 50 9   # ;
+60  = ``MULT 6  10  # <
+61  = ``PLUS 60 1   # =
+62  = ``PLUS 60 2   # >
+63  = ``PLUS 60 3   # ?
+64  = ``PLUS 60 4   # @
+65  = ``PLUS 60 5   # A
+66  = ``PLUS 60 6   # B
+67  = ``PLUS 60 7   # C
+68  = ``PLUS 60 8   # D
+69  = ``PLUS 60 9   # E
+70  = ``MULT 7  10  # F
+71  = ``PLUS 70 1   # G
+72  = ``PLUS 70 2   # H
+73  = ``PLUS 70 3   # I
+74  = ``PLUS 70 4   # J
+75  = ``PLUS 70 5   # K
+76  = ``PLUS 70 6   # L
+77  = ``PLUS 70 7   # M
+78  = ``PLUS 70 8   # N
+79  = ``PLUS 70 9   # O
+80  = ``MULT 8  10  # P
+81  = ``PLUS 80 1   # Q
+82  = ``PLUS 80 2   # R
+83  = ``PLUS 80 3   # S
+84  = ``PLUS 80 4   # T
+85  = ``PLUS 80 5   # U
+86  = ``PLUS 80 6   # V
+87  = ``PLUS 80 7   # W
+88  = ``PLUS 80 8   # X
+89  = ``PLUS 80 9   # Y
+90  = ``MULT 9  10  # Z
+91  = ``PLUS 90 1   # [
+92  = ``PLUS 90 2   # \
+93  = ``PLUS 90 3   # ]
+94  = ``PLUS 90 4   # ^
+95  = ``PLUS 90 5   # _
+96  = ``PLUS 90 6   # `
+97  = ``PLUS 90 7   # a
+98  = ``PLUS 90 8   # b
+99  = ``PLUS 90 9   # c
+100 = ``MULT 10  10 # d
+101 = ``PLUS 100 1  # e
+102 = ``PLUS 100 2  # f
+103 = ``PLUS 100 3  # g
+104 = ``PLUS 100 4  # h
+105 = ``PLUS 100 5  # i
+106 = ``PLUS 100 6  # j
+107 = ``PLUS 100 7  # k
+108 = ``PLUS 100 8  # l
+109 = ``PLUS 100 9  # m
+110 = ``MULT 11  10 # n
+111 = ``PLUS 110 1  # o
+112 = ``PLUS 110 2  # p
+113 = ``PLUS 110 3  # q
+114 = ``PLUS 110 4  # r
+115 = ``PLUS 110 5  # s
+116 = ``PLUS 110 6  # t
+117 = ``PLUS 110 7  # u
+118 = ``PLUS 110 8  # v
+119 = ``PLUS 110 9  # w
+120 = ``MULT 12  10 # x
+121 = ``PLUS 120 1  # y
+122 = ``PLUS 120 2  # z
+123 = ``PLUS 120 3  # {
+124 = ``PLUS 120 4  # |
+125 = ``PLUS 120 5  # }
+126 = ``PLUS 120 6  # ~
+127 = ``PLUS 120 7
+128 = ``PLUS 120 8
+
+256 = ```sii4              # 4^4 -> 256
