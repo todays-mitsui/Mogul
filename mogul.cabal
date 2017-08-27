@@ -18,6 +18,7 @@ library
   exposed-modules:     Lib
                      , Expr
                      , Parser
+                     , PPrint
                      , Focus
   build-depends:       base >= 4.7 && < 5
                      , bytestring

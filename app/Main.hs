@@ -4,11 +4,12 @@ module Main where
 
 
 import Text.Parsec (parse)
-import Parser      (expr)
+import Parser      (expr, def)
+import PPrint      (pp)
 
 main :: IO ()
-main = case parse expr "" "^xyz.``xz`yz" of
+main = case parse def "" "```sxyz = ``xz`yz" of
             Left  parseError -> putStrLn . show $ parseError
-            Right parsedExpr -> putStrLn . show $ parsedExpr
+            Right parsedExpr -> putStrLn . pp $ parsedExpr
 
 skk = parse expr "" "``skk"
