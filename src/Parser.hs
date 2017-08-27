@@ -56,16 +56,30 @@ var = Var <$> ident
 
 --------------------------------------------------------------------------------
 
+-- | 関数定義の左辺部 "```f x y z" の形だけを許す
+defFunc :: Parser (Ident, [Ident])
+defFunc = defFunc' <|> do
+  v <- token ident
+  return (v, [])
+
+defFunc' :: Parser (Ident, [Ident])
+defFunc' = do
+  token $ char '`'
+  (funcName, args) <- token defFunc
+  arg <- token ident
+  return (funcName, arg:args)
+
 -- | 関数定義
-def :: Parser (Ident, Expr)
+def :: Parser (Ident, Function)
 def = do
-  x <- token ident
+  (f, args) <- token defFunc
   token $ char '='
   e <- token expr
   spaces'
   skipMany lineComment
   void endOfLine <|> eof
-  return (x, e)
+  let fullExpr = foldl (flip (:^)) e args -- 左辺にある args を右辺に移して　Lambda を作成
+  return (f, Function (length args) fullExpr)
 
 -- | 関数定義の組
 context :: Parser Context

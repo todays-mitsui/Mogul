@@ -19,7 +19,14 @@ data Expr = Expr :$ Expr
             | Var Ident
             deriving (Eq, Show, Read)
 
-type Context = Map Ident Expr
+-- | 引数の長さを保持した無名関数
+data Function = Function {
+                  argLength :: Int
+                , alias     :: Expr
+                }
+                deriving (Eq, Show, Read)
+
+type Context = Map Ident Function
 
 emptyContext = Map.empty
 
@@ -90,7 +97,8 @@ subst = subst' Set.empty
 subst' :: Set Ident -> Context -> Expr -> Expr
 subst' vs context x@(Var v)
   | v `Set.notMember` vs && v `Map.member` context
-                           = subst context $ context ! v
+                           = let Function _ e = context ! v
+                             in  subst context e
   | otherwise              = x
 subst' vs context (v :^ e)  = v :^ subst' (v `Set.insert` vs) context e
 subst' vs context (e :$ e') = subst' vs context e :$ subst' vs context e'
