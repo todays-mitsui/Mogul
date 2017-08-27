@@ -11,33 +11,36 @@ import Data.ByteString.Char8 (ByteString, unpack)
 import Expr
 
 class PPrintable a where
-  pp :: a -> String
-
-instance PPrintable Ident where
-  pp (Ident bs) = unpack bs
-
-instance PPrintable Expr where
+  prepara :: a -> [Phrase]
+  pp      :: a -> String
   pp = render . prepara
 
+instance PPrintable Ident where
+  prepara = (:[]) . symbol
+
+instance PPrintable Expr where
+  prepara = prepara' []
+
 instance PPrintable Function where
-  pp = pp . alias
+  prepara = prepara . alias
 
 instance PPrintable (Ident, Function) where
-  pp (v, f) = pp v <> " = " <> pp f
+  prepara (v, f) = symbol v : Equal : prepara f
 
 --------------------------------------------------------------------------------
 
-data Phrase = Backquote
-              | Lambda
-              | Dot
-              | Symbol ByteString
-              | LargeSymbol ByteString
+data Phrase = Backquote                 -- "`"
+              | Lambda                  -- "^"
+              | Dot                     -- "."
+              | Equal                   -- "="
+              | Symbol ByteString       -- 英小文字1文字からなるシンボル
+              | LargeSymbol ByteString  -- 英数字2文字以上からなるシンボル
               deriving (Eq, Show)
 
 --------------------------------------------------------------------------------
 
-prepara :: Expr -> [Phrase]
-prepara = prepara' []
+-- prepara :: Expr -> [Phrase]
+-- prepara = prepara' []
 
 prepara' :: [Phrase] -> Expr -> [Phrase]
 prepara' acc (e :$ e') = Backquote : prepara' (prepara' acc e') e
@@ -68,5 +71,6 @@ byteStringShow :: Phrase -> ByteString
 byteStringShow Backquote       = "`"
 byteStringShow Lambda          = "^"
 byteStringShow Dot             = "."
+byteStringShow Equal           = "="
 byteStringShow (Symbol s)      = s
 byteStringShow (LargeSymbol s) = s
