@@ -13,6 +13,7 @@ import Data.ByteString.Char8 (ByteString, singleton, pack)
 import Text.Parsec hiding (token)
 import Text.Parsec.ByteString
 
+import Data
 import Expr
 
 
@@ -69,7 +70,7 @@ defFunc' = do
   return (funcName, arg:args)
 
 -- | 関数定義
-def :: Parser (Ident, Function)
+def :: Parser (Ident, Func)
 def = do
   (f, args) <- token defFunc
   token $ char '='
@@ -78,7 +79,7 @@ def = do
   skipMany lineComment
   void endOfLine <|> eof
   let fullExpr = foldl (flip (:^)) e args -- 左辺にある args を右辺に移して　Lambda を作成
-  return (f, Function (length args) fullExpr)
+  return (f, Func (length args) fullExpr)
 
 -- | 関数定義の組
 context :: Parser Context

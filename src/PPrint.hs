@@ -9,6 +9,7 @@ import qualified Data.ByteString.Char8 as BS
 import Data.ByteString.Char8 (ByteString, unpack)
 import Data.Map.Lazy (foldrWithKey)
 
+import Data
 import Expr
 
 class PPrintable a where
@@ -22,10 +23,10 @@ instance PPrintable Ident where
 instance PPrintable Expr where
   prepara = prepara' []
 
-instance PPrintable Function where
+instance PPrintable Func where
   prepara = prepara . alias
 
-instance PPrintable (Ident, Function) where
+instance PPrintable (Ident, Func) where
   prepara (v, f) = symbol v : Equal : prepara f
 
 instance PPrintable Context where

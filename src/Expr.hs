@@ -2,35 +2,16 @@
 
 module Expr where
 
+import Control.Monad (guard)
 import Data.ByteString.Char8 (ByteString)
 import Data.Set (Set)
 import qualified Data.Set      as Set
 import Data.Map.Lazy (Map, (!))
 import qualified Data.Map.Lazy as Map
 
+import Data
+import Focus
 
-data Ident = Ident ByteString
-             deriving (Eq, Ord, Show, Read)
-
-infixl 9 :$
-infixr 7 :^
-data Expr = Expr :$ Expr
-            | Ident :^ Expr
-            | Var Ident
-            deriving (Eq, Show, Read)
-
--- | 引数の長さを保持した無名関数
-data Function = Function {
-                  argLength :: Int
-                , alias     :: Expr
-                }
-                deriving (Eq, Show, Read)
-
-type Context = Map Ident Function
-
-emptyContext = Map.empty
-
---------------------------------------------------------------------------------
 
 i :: Expr
 i = Var (Ident "i")
@@ -40,6 +21,16 @@ k = Var (Ident "k")
 
 s :: Expr
 s = Var (Ident "s")
+
+--------------------------------------------------------------------------------
+
+-- | 式中の全ての定義済み関数を展開し、すべてのλ抽象をSKコンビネーターに展開する
+compile :: Context -> Expr -> Expr
+compile context x@(Var v)
+  | v `Map.member` context  = compile context $ subst context x
+  | otherwise               = x
+compile context l@(_ :^ _)  = compile context $ unlambda l
+compile context (e :$ e')   = compile context e :$ compile context e'
 
 --------------------------------------------------------------------------------
 
@@ -97,19 +88,50 @@ subst = subst' Set.empty
 subst' :: Set Ident -> Context -> Expr -> Expr
 subst' vs context x@(Var v)
   | v `Set.notMember` vs && v `Map.member` context
-                           = let Function _ e = context ! v
+                           = let Func _ e = context ! v
                              in  subst context e
   | otherwise              = x
 subst' vs context (v :^ e)  = v :^ subst' (v `Set.insert` vs) context e
 subst' vs context (e :$ e') = subst' vs context e :$ subst' vs context e'
 
 --------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
-compile :: Context -> Expr -> Expr
-compile context x@(Var v)
-  | v `Map.member` context  = compile context $ subst context x
-  | otherwise               = x
-compile context l@(_ :^ _)  = compile context $ unlambda l
-compile context (e :$ e')   = compile context e :$ compile context e'
+-- eval :: Context -> ExprFocus -> Maybe ExprFocus
+-- eval context (Var v, argCount, crumbs) = do
+--   rank <- varRank context v
+--   e    <- varAlias context v
+--   guard (rank >= argCount)
+--   goUps rank (e, argCount, crumbs)
+--
+-- eval context
+
+canReduct :: Context -> Int -> Expr -> Bool
+canReduct context argCount (Var v)
+  = case varRank context v of
+         Just rank -> rank >= argCount
+         Nothing   -> False
+
+canReduct context argCount (_ :^ _ )
+  = argCount >= 1
+
+canReduct context argCount (e :$ e')
+  = canReduct context (argCount+1) e || canReduct context 0 e'
 
 --------------------------------------------------------------------------------
+
+-- | 変数のランクを取得
+varRank :: Context -> Ident -> Maybe Int
+varRank context v = rank <$> v `Map.lookup` context
+
+-- | 変数の実体を取得
+varAlias :: Context -> Ident -> Maybe Expr
+varAlias context v = alias <$> v `Map.lookup` context
+
+-- | 式の書き換えを実行 (^x.M)N => M[x:=N]
+rewrite :: Ident -> Expr -> Expr -> Expr
+rewrite v e w@(Var w')
+  | v == w'   = e
+  | otherwise = w
+rewrite v e (v' :^ e' ) = v' :^ rewrite v e e'
+rewrite v e (e' :$ e'') = rewrite v e e' :$ rewrite v e e''

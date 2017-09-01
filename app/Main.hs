@@ -6,6 +6,7 @@ module Main where
 import Control.Monad (forever)
 import qualified Data.ByteString.Char8 as BS
 
+import Data
 import Expr
 import Eval
 
