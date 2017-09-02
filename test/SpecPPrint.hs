@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TestPPrint (
-  testPPrintPp
+module SpecPPrint (
+  specPPrintPp
 ) where
 
 
@@ -14,7 +14,7 @@ import Data
 import PPrint
 
 
-testPPrintPp = describe "PPrint.pp" $ do
+specPPrintPp = describe "PPrint.pp" $ do
     context "when pp(s :$ k :$ k)" $ do
       it "return '``skk'" $ do
         pp (s :$ k :$ k) `shouldBe` "``skk"
@@ -28,6 +28,11 @@ testPPrintPp = describe "PPrint.pp" $ do
       it "return '``s_ _'" $ do
         pp (s :$ Var (Ident "_") :$ Var (Ident "_"))
           `shouldBe` "``s_ _"
+
+    context "when pp((s, Func [z, y, x] (x :$ z :$ (y :$ z))))" $ do
+      it "return 's=^x.^y.^z.``xz`yz'" $ do
+        pp (Ident "s", Func [z, y, x] $ Var x :$ Var z :$ (Var y :$ Var z))
+          `shouldBe` "s=^x.^y.^z.``xz`yz"
 
 --------------------------------------------------------------------------------
 

@@ -45,9 +45,9 @@ test-suite mogul-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       TestParser
-                     , TestExpr
-                     , TestPPrint
+  other-modules:       SpecParser
+                     , SpecExpr
+                     , SpecPPrint
   build-depends:       base
                      , hspec
                      , mogul

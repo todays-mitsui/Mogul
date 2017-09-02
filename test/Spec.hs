@@ -2,23 +2,23 @@
 
 import Test.Hspec
 
-import TestParser
-import TestExpr
-import TestPPrint
+import SpecParser
+import SpecExpr
+import SpecPPrint
 
 
 main :: IO ()
 main = hspec $ do
-  testParserIdent
-  testParserExpr
-  testParserDef
-  testParserContext
-  testParserLineComment
+  specParserIdent
+  specParserExpr
+  specParserDef
+  specParserContext
+  specParserLineComment
 
-  testExprIsFreeIn
-  testExprResolve
-  testExprUnlambda
-  testExprSubst
-  testExprCompile
+  specExprIsFreeIn
+  specExprResolve
+  specExprUnlambda
+  specExprSubst
+  specExprCompile
 
-  testPPrintPp
+  specPPrintPp

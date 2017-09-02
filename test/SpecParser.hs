@@ -1,11 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TestParser (
-  testParserIdent,
-  testParserExpr,
-  testParserDef,
-  testParserContext,
-  testParserLineComment
+module SpecParser (
+  specParserIdent,
+  specParserExpr,
+  specParserDef,
+  specParserContext,
+  specParserLineComment
 ) where
 
 
@@ -31,7 +31,7 @@ instance Eq ParseError where
 
 --------------------------------------------------------------------------------
 
-testParserIdent = describe "Parser.ident" $ do
+specParserIdent = describe "Parser.ident" $ do
   it "can parse single letter identifier, ex. 'x'" $ do
     parse ident "" "x" `shouldBe` Right (Ident "x")
 
@@ -42,7 +42,7 @@ testParserIdent = describe "Parser.ident" $ do
     parse ident "" "42" `shouldBe` Right (Ident "42")
 
 
-testParserExpr = describe "Parser.expr" $ do
+specParserExpr = describe "Parser.expr" $ do
   it "can parse apply statement, ex. '`xy'" $ do
     parse expr "" "`xy" `shouldBe` Right (Var x :$ Var y)
 
@@ -63,13 +63,13 @@ testParserExpr = describe "Parser.expr" $ do
       isLeft (parse expr "" "``xy")
 
 
-testParserDef = describe "Parser.def" $ do
+specParserDef = describe "Parser.def" $ do
     it "can parse Ident define" $ do
       let src = intercalate (singleton '\n') ["``kxy = y", "```sxyz = ``xz`yz", "i = ``skk"]
       parse def "" src `shouldBe` Right (Ident "k", Func [y, x] (Var y))
 
 
-testParserContext = describe "Parser.context" $ do
+specParserContext = describe "Parser.context" $ do
     it "can parse Ident defines" $ do
       let src = intercalate (singleton '\n') ["``kxy = y", "```sxyz = ``xz`yz", "i = ``skk"]
       parse P.context "" src
@@ -82,7 +82,7 @@ testParserContext = describe "Parser.context" $ do
           )
 
 
-testParserLineComment = describe "Parser.lineComment" $ do
+specParserLineComment = describe "Parser.lineComment" $ do
     it "can parse line comment, ex '# foo! bar!\\n'" $ do
       parse lineComment "" "# foo! bar!\n" `shouldBe` Right ()
 

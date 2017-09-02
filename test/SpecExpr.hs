@@ -1,11 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module TestExpr (
-  testExprIsFreeIn,
-  testExprResolve,
-  testExprUnlambda,
-  testExprSubst,
-  testExprCompile
+module SpecExpr (
+  specExprIsFreeIn,
+  specExprResolve,
+  specExprUnlambda,
+  specExprSubst,
+  specExprCompile
 ) where
 
 
@@ -28,7 +28,7 @@ readSampleContext = parse P.context "" <$> BS.readFile "test/sample.context"
 
 --------------------------------------------------------------------------------
 
-testExprIsFreeIn = describe "x `Expr.isFreeIn` expr" $ do
+specExprIsFreeIn = describe "x `Expr.isFreeIn` expr" $ do
     context "when x is free in expr" $ do
       it "retrun True" $
         x `isFreeIn` (y :^ Var y :$ Var x)
@@ -38,7 +38,7 @@ testExprIsFreeIn = describe "x `Expr.isFreeIn` expr" $ do
         not (x `isFreeIn` (x :^ Var x :$ Var y))
 
 
-testExprResolve = describe "Expr.resolve" $ do
+specExprResolve = describe "Expr.resolve" $ do
     it "resolve ^x.x to i" $ do
       resolve x (Var x) `shouldBe` i
 
@@ -53,7 +53,7 @@ testExprResolve = describe "Expr.resolve" $ do
         `shouldBe` (s :$ resolve x (f :$ Var x) :$ resolve x (g :$ Var x))
 
 
-testExprUnlambda = describe "Expr.unlambda" $ do
+specExprUnlambda = describe "Expr.unlambda" $ do
     it "resolve ^x.x to i" $ do
       unlambda (x :^ Var x) `shouldBe` i
 
@@ -73,7 +73,7 @@ testExprUnlambda = describe "Expr.unlambda" $ do
         `shouldBe` (s :$ (s :$ (s :$ (k :$ s) :$ k) :$ (k :$ (s :$ i :$ i))) :$ (s :$ (s :$ (k :$ s) :$ k) :$ (k :$ (s :$ i :$ i))))
 
 
-testExprSubst = describe "Expr.subst" $ do
+specExprSubst = describe "Expr.subst" $ do
     it "substitute ISZERO combination of subfunctions" $ do
       Right context <- liftIO readSampleContext
       subst context (Var (Ident "ISZERO"))
@@ -90,7 +90,7 @@ testExprSubst = describe "Expr.subst" $ do
         `shouldBe` (Ident "NAMED" :^ Var (Ident "NAMED") :$ Var (Ident "NAMED"))
 
 
-testExprCompile = describe "Expr.compile" $ do
+specExprCompile = describe "Expr.compile" $ do
     it "compile ISZERO to SKI Combinator" $ do
       Right context <- liftIO readSampleContext
       compile context (Var (Ident "ISZERO"))

@@ -24,7 +24,7 @@ instance PPrintable Expr where
   prepara = prepara' []
 
 instance PPrintable Func where
-  prepara = prepara . body
+  prepara (Func args e) = prepara $ foldl (flip (:^)) e args
 
 instance PPrintable (Ident, Func) where
   prepara (v, f) = symbol v : Equal : prepara f
