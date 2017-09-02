@@ -13,17 +13,6 @@ import Data
 import Focus
 
 
-i :: Expr
-i = Var (Ident "i")
-
-k :: Expr
-k = Var (Ident "k")
-
-s :: Expr
-s = Var (Ident "s")
-
---------------------------------------------------------------------------------
-
 -- | 式中の全ての定義済み関数を展開し、すべてのλ抽象をSKコンビネーターに展開する
 compile :: Context -> Expr -> Expr
 compile context x@(Var v)

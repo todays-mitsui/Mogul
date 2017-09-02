@@ -48,7 +48,7 @@ rank_ context v = length . args <$> v `Map.lookup` context
 getAlias :: Context -> Ident -> Maybe Expr
 getAlias context v
   | v `Map.member` context = let f = context ! v
-                             in  Just $ alias f
+                             in  Just $ body f
   | otherwise              = Nothing
 
 apply :: Ident -> Expr -> Expr -> Expr

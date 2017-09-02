@@ -24,7 +24,7 @@ instance PPrintable Expr where
   prepara = prepara' []
 
 instance PPrintable Func where
-  prepara = prepara . alias
+  prepara = prepara . body
 
 instance PPrintable (Ident, Func) where
   prepara (v, f) = symbol v : Equal : prepara f
