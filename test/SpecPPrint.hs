@@ -8,8 +8,6 @@ module SpecPPrint (
 import Test.Hspec
 -- import Control.Exception (evaluate)
 
-import Control.Monad.Trans   (liftIO)
-
 import Data
 import PPrint
 
@@ -28,6 +26,11 @@ specPPrintPp = describe "PPrint.pp" $ do
       it "return '``s_ _'" $ do
         pp (s :$ Var (Ident "_") :$ Var (Ident "_"))
           `shouldBe` "``s_ _"
+
+    context "when pp(Func [y, x] (y :$ x))" $ do
+      it "return '^x.^y.`yx'" $ do
+        pp (Func [y, x] (Var y :$ Var x))
+          `shouldBe` "^x.^y.`yx"
 
     context "when pp((s, Func [z, y, x] (x :$ z :$ (y :$ z))))" $ do
       it "return 's=^x.^y.^z.``xz`yz'" $ do

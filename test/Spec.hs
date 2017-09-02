@@ -4,6 +4,7 @@ import Test.Hspec
 
 import SpecParser
 import SpecExpr
+import SpecFocus
 import SpecPPrint
 
 
@@ -20,5 +21,9 @@ main = hspec $ do
   specExprUnlambda
   specExprSubst
   specExprCompile
+
+  specFocusGoLeftOrRightOrUpOrIntoLambda
+  specFocusGoUps
+  specFocusGoRoot
 
   specPPrintPp
