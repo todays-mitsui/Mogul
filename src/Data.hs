@@ -25,8 +25,8 @@ module Data (
 
   -- | 引数の長さを保持した無名関数
   data Func = Func {
-                rank  :: Int
-              , alias :: Expr
+                args :: [Ident]
+              , body :: Expr
               }
               deriving (Eq, Show, Read)
 

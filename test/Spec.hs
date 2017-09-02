@@ -59,7 +59,7 @@ main = hspec $ do
   describe "Parser.def" $ do
     it "can parse Ident define" $ do
       let src = intercalate (singleton '\n') ["``kxy = y", "```sxyz = ``xz`yz", "i = ``skk"]
-      parse def "" src `shouldBe` Right (Ident "k", Func 2 (x :^ y :^ Var y))
+      parse def "" src `shouldBe` Right (Ident "k", Func [y, x] (Var y))
 
   describe "Parser.context" $ do
     it "can parse Ident defines" $ do
@@ -67,9 +67,9 @@ main = hspec $ do
       parse P.context "" src
         `shouldBe` Right (
             Map.fromList [
-              (Ident "i", Func 0 (Var (Ident "s") :$ Var (Ident "k") :$ Var (Ident "k"))),
-              (Ident "k", Func 2 (x :^ y :^ Var y)),
-              (Ident "s", Func 3 (x :^ y :^ z :^ Var x :$ Var z :$ (Var y :$ Var z)))
+              (Ident "i", Func [] (Var (Ident "s") :$ Var (Ident "k") :$ Var (Ident "k"))),
+              (Ident "k", Func [y, x] (Var y)),
+              (Ident "s", Func [z, y, x] (Var x :$ Var z :$ (Var y :$ Var z)))
             ]
           )
 

@@ -78,8 +78,7 @@ def = do
   spaces'
   skipMany lineComment
   void endOfLine <|> eof
-  let fullExpr = foldl (flip (:^)) e args -- 左辺にある args を右辺に移して　Lambda を作成
-  return (f, Func (length args) fullExpr)
+  return (f, Func args e)
 
 -- | 関数定義の組
 context :: Parser Context

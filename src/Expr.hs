@@ -122,11 +122,11 @@ canReduct context argCount (e :$ e')
 
 -- | 変数のランクを取得
 varRank :: Context -> Ident -> Maybe Int
-varRank context v = rank <$> v `Map.lookup` context
+varRank context v = length . args <$> v `Map.lookup` context
 
 -- | 変数の実体を取得
 varAlias :: Context -> Ident -> Maybe Expr
-varAlias context v = alias <$> v `Map.lookup` context
+varAlias context v = body <$> v `Map.lookup` context
 
 -- | 式の書き換えを実行 (^x.M)N => M[x:=N]
 rewrite :: Ident -> Expr -> Expr -> Expr

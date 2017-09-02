@@ -60,7 +60,7 @@ rootExpr focus = let (e, _, _) = goRoot focus
                  in  e
 
 
-rollupRight :: Int -> ExprFocus -> Maybe (Expr, [Expr], ArgCount, [ExprCrumb])
-rollupRight = undefined
+-- rollupArgs :: Int -> ExprFocus -> Maybe ((Expr, [Expr]), ArgCount, [ExprCrumb])
+-- rollupArgs = undefined
 
-rollupRight
+-- rollupRight
