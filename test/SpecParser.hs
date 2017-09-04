@@ -66,7 +66,7 @@ specParserExpr = describe "Parser.expr" $ do
 specParserDef = describe "Parser.def" $ do
     it "can parse Ident define" $ do
       let src = intercalate (singleton '\n') ["``kxy = y", "```sxyz = ``xz`yz", "i = ``skk"]
-      parse def "" src `shouldBe` Right (Ident "k", Func [y, x] (Var y))
+      parse def "" src `shouldBe` Right (Ident "k", Func [x, y] (Var y))
 
 
 specParserContext = describe "Parser.context" $ do
@@ -76,8 +76,8 @@ specParserContext = describe "Parser.context" $ do
         `shouldBe` Right (
             Map.fromList [
               (Ident "i", Func [] (Var (Ident "s") :$ Var (Ident "k") :$ Var (Ident "k"))),
-              (Ident "k", Func [y, x] (Var y)),
-              (Ident "s", Func [z, y, x] (Var x :$ Var z :$ (Var y :$ Var z)))
+              (Ident "k", Func [x, y] (Var y)),
+              (Ident "s", Func [x, y, z] (Var x :$ Var z :$ (Var y :$ Var z)))
             ]
           )
 
