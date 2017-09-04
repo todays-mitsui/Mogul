@@ -14,7 +14,7 @@ import Text.Parsec hiding (token)
 import Text.Parsec.ByteString
 
 import Data
-import Expr
+-- import Expr
 
 
 ident :: Parser Ident
@@ -72,13 +72,13 @@ defFunc' = do
 -- | 関数定義
 def :: Parser (Ident, Func)
 def = do
-  (f, args) <- token defFunc
+  (f, reversedArgs) <- token defFunc
   token $ char '='
   e <- token expr
   spaces'
   skipMany lineComment
   void endOfLine <|> eof
-  return (f, Func args e)
+  return (f, Func (reverse reversedArgs) e)
 
 -- | 関数定義の組
 context :: Parser Context

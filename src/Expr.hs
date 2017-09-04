@@ -124,3 +124,15 @@ rewrite v e w@(Var w')
   | otherwise = w
 rewrite v e (v' :^ e' ) = v' :^ rewrite v e e'
 rewrite v e (e' :$ e'') = rewrite v e e' :$ rewrite v e e''
+
+--------------------------------------------------------------------------------
+
+-- | 定義済みの関数に規定数の引数を適用して評価する
+-- | TODO: α変換を考慮する
+apply :: Context -> Ident -> [Expr] -> Expr
+apply context v es = case v `Map.lookup` context of
+                            Just (Func args funcBody) -> apply' args es funcBody
+                            Nothing                   -> foldl (:$) (Var v) es
+
+apply' :: [Ident] -> [Expr] -> Expr -> Expr
+apply' args es funcBody = foldl (\body (arg, e) -> rewrite arg e body) funcBody $ zip args es

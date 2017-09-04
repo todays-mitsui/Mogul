@@ -131,6 +131,7 @@ specFocusGoUps = describe "Focus.goUps" $ do
       goUps 4 focus `shouldBe` Nothing
       goUps 5 focus `shouldBe` Nothing
 
+
 specFocusGoRoot = describe "Focus.goRoot" $ do
   context "when in (s, 2, [RightCrumb k, RightCrumb k])" $ do
     it "goRoot return (``skk, 0, [])" $ do

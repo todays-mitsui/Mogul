@@ -5,3 +5,5 @@ TRUE = ^xy.x  # 真
 FALSE = ^xy.y # 偽
 
 NAMED = ^NAMED.`NAMED NAMED
+
+```FLIP fxy = ``fyx
