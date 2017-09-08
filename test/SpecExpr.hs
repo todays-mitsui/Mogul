@@ -9,6 +9,7 @@ module SpecExpr (
   specExprApply
 ) where
 
+import System.IO
 
 import Test.Hspec
 -- import Control.Exception (evaluate)
@@ -16,7 +17,8 @@ import Test.Hspec
 import Control.Monad.Trans   (liftIO)
 import Text.Parsec           (parse)
 import Text.Parsec.Error     (ParseError, errorMessages)
-import qualified Data.ByteString.Char8 as BS
+import qualified Data.Text as T
+import qualified Data.Text.IO as TIO
 
 import Data
 import Parser hiding (context)
@@ -25,7 +27,10 @@ import Expr
 
 
 readSampleContext :: IO (Either ParseError Context)
-readSampleContext = parse P.context "" <$> BS.readFile "test/sample.context"
+readSampleContext = parse P.context "" <$> do
+  h <- openFile "test/sample.context" ReadMode
+  hSetEncoding h utf8
+  TIO.hGetContents h
 
 --------------------------------------------------------------------------------
 
@@ -77,54 +82,54 @@ specExprUnlambda = describe "Expr.unlambda" $ do
 specExprSubst = describe "Expr.subst" $ do
   it "substitute ISZERO combination of subfunctions" $ do
     Right context <- liftIO readSampleContext
-    subst context (Var (Ident "ISZERO"))
-      `shouldBe` (n :^ (Var n :$ (Ident "_" :^ x :^ y :^ Var y)) :$ (x :^ y :^ Var x))
+    subst context (Var (LargeIdent "ISZERO" Nothing))
+      `shouldBe` (n :^ (Var n :$ (LargeIdent "_" Nothing :^ x :^ y :^ Var y)) :$ (x :^ y :^ Var x))
 
   it "dosent substitute undefined variable" $ do
     Right context <- liftIO readSampleContext
-    subst context (Var (Ident "FOO"))
-      `shouldBe` Var (Ident "FOO")
+    subst context (Var (LargeIdent "FOO" Nothing))
+      `shouldBe` Var (LargeIdent "FOO" Nothing)
 
   it "dosent substitute undefined variable" $ do
     Right context <- liftIO readSampleContext
-    subst context (Var (Ident "NAMED"))
-      `shouldBe` (Ident "NAMED" :^ Var (Ident "NAMED") :$ Var (Ident "NAMED"))
+    subst context (Var (LargeIdent "NAMED" Nothing))
+      `shouldBe` (LargeIdent "NAMED"  Nothing :^ Var (LargeIdent "NAMED" Nothing) :$ Var (LargeIdent "NAMED" Nothing))
 
 
 specExprCompile = describe "Expr.compile" $ do
   it "compile ISZERO to SKI Combinator" $ do
     Right context <- liftIO readSampleContext
-    compile context (Var (Ident "ISZERO"))
+    compile context (Var (LargeIdent "ISZERO" Nothing))
       `shouldBe` (s :$ (s :$ i :$ (k :$ (k :$ (k :$ i)))) :$ (k :$ k))
 
   it "dosent compile undefined variable" $ do
     Right context <- liftIO readSampleContext
-    compile context (Var (Ident "FOO"))
-      `shouldBe` Var (Ident "FOO")
+    compile context (Var (LargeIdent "FOO" Nothing))
+      `shouldBe` Var (LargeIdent "FOO" Nothing)
 
-  it "dosent compile undefined variable" $ do
+  it "..." $ do
     Right context <- liftIO readSampleContext
-    compile context (Var (Ident "NAMED"))
+    compile context (Var (LargeIdent "NAMED" Nothing))
       `shouldBe` (s :$ i :$ i)
 
 specExprApply = describe "Expr.apply" $ do
   it "can call Func with given Args" $ do
     Right context <- liftIO readSampleContext
-    apply context (Ident "FLIP") [Var (Ident "F"), Var (Ident "X"), Var (Ident "Y")]
-      `shouldBe` (Var (Ident "F") :$ Var (Ident "Y") :$ Var (Ident "X"))
+    apply context (LargeIdent "FLIP" Nothing) [Var (LargeIdent "F" Nothing), Var (LargeIdent "X" Nothing), Var (LargeIdent "Y" Nothing)]
+      `shouldBe` (Var (LargeIdent "F" Nothing) :$ Var (LargeIdent "Y" Nothing) :$ Var (LargeIdent "X" Nothing))
 
   it "can call Undefined Variable also" $ do
     Right context <- liftIO readSampleContext
-    apply context (Ident "UNDEFINED_FUNC") [Var x, Var y, Var z]
-      `shouldBe` (Var (Ident "UNDEFINED_FUNC") :$ Var x :$ Var y :$ Var z)
+    apply context (LargeIdent "UNDEFINED_FUNC" Nothing) [Var x, Var y, Var z]
+      `shouldBe` (Var (LargeIdent "UNDEFINED_FUNC" Nothing) :$ Var x :$ Var y :$ Var z)
 
   --------------------------------------------------------------------------------
 
-x = Ident "x"
-y = Ident "y"
-z = Ident "z"
+x = UniIdent "x"
+y = UniIdent "y"
+z = UniIdent "z"
 
-n = Ident "n"
+n = UniIdent "n"
 
 f = s :$ k :$ k
 g = k :$ i

@@ -3,11 +3,15 @@
 module Expr where
 
 import Control.Monad (guard)
-import Data.ByteString.Char8 (ByteString)
-import Data.Set (Set)
+
+import qualified Data.Text as T
+import Data.Text (Text)
 import qualified Data.Set      as Set
-import Data.Map.Lazy (Map, (!))
+import Data.Set (Set)
 import qualified Data.Map.Lazy as Map
+import Data.Map.Lazy (Map, (!))
+import Text.Parsec hiding (token)
+import Text.Parsec.Text
 
 import Data
 import Focus
@@ -136,3 +140,23 @@ apply context v es = case v `Map.lookup` context of
 
 apply' :: [Ident] -> [Expr] -> Expr -> Expr
 apply' args es funcBody = foldl (\body (arg, e) -> rewrite arg e body) funcBody $ zip args es
+
+--------------------------------------------------------------------------------
+
+-- rename :: Set Ident -> Ident -> Ident
+-- rename reserved v@(Ident s)
+--   | not $ v `Set.member` reserved = v
+--   | otherwise                     = rename reserved . Ident . renameSymbol $ s
+
+-- renameSymbol :: Text -> Text
+-- renameSymbol s
+--   | isShortSymbol s = toUpper s <> "0"
+--   | otherwise       =
+-- where
+--   isShortSymbol s = 1 == T.length s && s `T.isInfixOf` lowers
+--   lowers = "abcdefghijklmnopqrstuvwxyz"
+
+-- increment :: Text -> Text
+-- increment s =
+--   case s =~~ "[0-9]+$" of
+--        Just intStr ->

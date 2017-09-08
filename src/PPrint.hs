@@ -5,8 +5,8 @@ module PPrint (pp) where
 
 
 import Data.Monoid ((<>))
-import qualified Data.ByteString.Char8 as BS
-import Data.ByteString.Char8 (ByteString, unpack)
+import qualified Data.Text as T
+import Data.Text (Text, pack, unpack)
 import Data.Map.Lazy (foldrWithKey)
 
 import Data
@@ -34,13 +34,13 @@ instance PPrintable Context where
 
 --------------------------------------------------------------------------------
 
-data Phrase = Backquote                 -- "`"
-              | Lambda                  -- "^"
-              | Dot                     -- "."
-              | Equal                   -- "="
-              | Symbol ByteString       -- 英小文字1文字からなるシンボル
-              | LargeSymbol ByteString  -- 英数字2文字以上からなるシンボル
-              | EOL                     -- 行端
+data Phrase = Backquote           -- "`"
+              | Lambda            -- "^"
+              | Dot               -- "."
+              | Equal             -- "="
+              | Symbol Text       -- 英小文字1文字からなるシンボル
+              | LargeSymbol Text  -- 英数字2文字以上からなるシンボル
+              | EOL               -- 行端
               deriving (Eq, Show)
 
 --------------------------------------------------------------------------------
@@ -55,29 +55,28 @@ prepara' acc (Var x)   = symbol x : acc
 
 
 symbol :: Ident -> Phrase
-symbol (Ident x)
-  | 1 == BS.length x && BS.head x `BS.elem` lowers = Symbol x
-  | otherwise                                      = LargeSymbol x
-  where lowers = "abcdefghijklmnopqrstuvwxyz"
+symbol (UniIdent   x)          = Symbol x
+symbol (LargeIdent x Nothing ) = LargeSymbol x
+symbol (LargeIdent x (Just n)) = LargeSymbol (x <> pack (show n))
 
 --------------------------------------------------------------------------------
 
 render :: [Phrase] -> String
 render = unpack . render'
 
-render' :: [Phrase] -> ByteString
+render' :: [Phrase] -> Text
 render' []        = ""
 render' (LargeSymbol s:ps@(LargeSymbol _:_))
                   = s <> " " <> render' ps
-render' (p:ps)    = byteStringShow p <> render' ps
+render' (p:ps)    = textShow p <> render' ps
 
 --------------------------------------------------------------------------------
 
-byteStringShow :: Phrase -> ByteString
-byteStringShow Backquote       = "`"
-byteStringShow Lambda          = "^"
-byteStringShow Dot             = "."
-byteStringShow Equal           = "="
-byteStringShow (Symbol s)      = s
-byteStringShow (LargeSymbol s) = s
-byteStringShow EOL             = "\n"
+textShow :: Phrase -> Text
+textShow Backquote       = "`"
+textShow Lambda          = "^"
+textShow Dot             = "."
+textShow Equal           = "="
+textShow (Symbol s)      = s
+textShow (LargeSymbol s) = s
+textShow EOL             = "\n"

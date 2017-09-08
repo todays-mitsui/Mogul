@@ -4,7 +4,8 @@ module Main where
 
 
 import Control.Monad (forever)
-import qualified Data.ByteString.Char8 as BS
+import qualified Data.Text    as T
+import qualified Data.Text.IO as TIO
 
 import Data
 import Expr
@@ -26,7 +27,7 @@ main = do
   forever $ do
     putStrLn "Input Lambda term:"
     putStr "> "
-    input <- BS.getLine
+    input <- TIO.getLine
     case parse expr "" input of
       Left  parseError -> putStrLn . show $ parseError
       Right e          -> do putStrLn . pp $ e
@@ -44,7 +45,7 @@ skk = parse expr "" "```skka"
 loadContext :: Maybe String -> IO Context
 loadContext Nothing         = return emptyContext
 loadContext (Just filepath) = do
-  eitherContext <- parse context "" <$> BS.readFile filepath
+  eitherContext <- parse context "" <$> TIO.readFile filepath
   case eitherContext of
        Left  parseError -> do putStrLn . show $ parseError
                               return emptyContext

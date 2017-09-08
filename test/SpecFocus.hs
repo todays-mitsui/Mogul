@@ -160,11 +160,11 @@ specFocusGoRoot = describe "Focus.goRoot" $ do
 
 --------------------------------------------------------------------------------
 
-x = Ident "x"
-y = Ident "y"
-z = Ident "z"
+x = UniIdent "x"
+y = UniIdent "y"
+z = UniIdent "z"
 
-n = Ident "n"
+n = UniIdent "n"
 
 f = s :$ k :$ k
 g = k :$ i

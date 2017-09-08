@@ -9,9 +9,11 @@ module Parser (
 import Control.Monad (void)
 import Control.Applicative hiding ((<|>), many)
 import qualified Data.Map.Lazy as Map
-import Data.ByteString.Char8 (ByteString, singleton, pack)
+import qualified Data.Text as T
+import Data.Text (Text, pack, singleton)
+
 import Text.Parsec hiding (token)
-import Text.Parsec.ByteString
+import Text.Parsec.Text
 
 import Data
 -- import Expr
@@ -21,10 +23,10 @@ ident :: Parser Ident
 ident = ident' <|> ident''
 
 ident' :: Parser Ident
-ident' = Ident . singleton <$> lower
+ident' = UniIdent . singleton <$> lower
 
 ident'' :: Parser Ident
-ident'' = Ident . pack <$> many1 (upper <|> digit <|> char '_')
+ident'' = (\s -> LargeIdent s Nothing) . pack <$> many1 (upper <|> digit <|> char '_')
 
 --------------------------------------------------------------------------------
 

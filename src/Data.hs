@@ -9,14 +9,15 @@ module Data (
   s, k, i
  ) where
 
-import Data.ByteString.Char8 (ByteString)
+import Data.Text (Text)
 import Data.Set (Set)
 import qualified Data.Set      as Set
 import Data.Map.Lazy (Map, (!))
 import qualified Data.Map.Lazy as Map
 
 
-data Ident = Ident ByteString
+data Ident = UniIdent Text
+             | LargeIdent Text (Maybe Int)
              deriving (Eq, Ord, Show, Read)
 
 infixl 9 :$
@@ -28,8 +29,8 @@ data Expr = Expr :$ Expr
 
 -- | 引数の長さを保持した無名関数
 data Func = Func {
-              args :: [Ident]
-            , body :: Expr
+              args :: [Ident],
+              body :: Expr
             }
             deriving (Eq, Show, Read)
 
@@ -40,10 +41,10 @@ emptyContext = Map.empty
 --------------------------------------------------------------------------------
 
 i :: Expr
-i = Var (Ident "i")
+i = Var (UniIdent "i")
 
 k :: Expr
-k = Var (Ident "k")
+k = Var (UniIdent "k")
 
 s :: Expr
-s = Var (Ident "s")
+s = Var (UniIdent "s")

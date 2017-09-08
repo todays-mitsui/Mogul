@@ -23,7 +23,7 @@ library
                      , Focus
                      , Eval
   build-depends:       base >= 4.7 && < 5
-                     , bytestring
+                     , text
                      , containers
                      , parsec3
                      , mtl
@@ -35,7 +35,7 @@ executable mogul-exe
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , mogul
-                     , bytestring
+                     , text
                      , containers
                      , parsec3
                      , mtl
@@ -52,7 +52,7 @@ test-suite mogul-test
   build-depends:       base
                      , hspec
                      , mogul
-                     , bytestring
+                     , text
                      , containers
                      , parsec3
                      , mtl

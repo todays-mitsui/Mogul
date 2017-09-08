@@ -1,2 +1,8 @@
 {
+    "haskell.hlint.executablePath": "C:\\Users\\tokyo014\\AppData\\Roaming\\local\\bin\\hlint.exe",
+    "haskell.ghcMod.maxNumberOfProblems": 100,
+    "haskell.ghcMod.executablePath": "C:\\Users\\tokyo014\\AppData\\Roaming\\local\\bin\\ghc-mod.exe",
+    "haskell.ghcMod.onHover": "fallback",
+    "haskell.ghcMod.check": true,
+    "haskell.ghcMod.logLevel": "error"
 }
