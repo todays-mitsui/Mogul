@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module SpecParser (
+module ParserSpec (
   specParserIdent,
   specParserExpr,
   specParserDef,

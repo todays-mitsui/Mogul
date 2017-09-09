@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module SpecExpr (
+module ExprSpec (
   specExprIsFreeIn,
   specExprResolve,
   specExprUnlambda,

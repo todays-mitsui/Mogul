@@ -2,10 +2,10 @@
 
 import Test.Hspec
 
-import SpecParser
-import SpecExpr
-import SpecFocus
-import SpecPPrint
+import ParserSpec
+import ExprSpec
+import FocusSpec
+import PPrintSpec
 
 
 main :: IO ()

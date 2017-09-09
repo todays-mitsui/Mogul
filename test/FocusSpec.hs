@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module SpecFocus (
+module FocusSpec (
   specFocusGoLeftOrRightOrUpOrIntoLambda,
   specFocusGoUps,
   specFocusGoRoot

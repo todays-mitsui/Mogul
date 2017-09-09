@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module SpecPPrint (
+module PPrintSpec (
   specPPrintPp
 ) where
 
