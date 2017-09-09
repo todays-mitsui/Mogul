@@ -6,7 +6,8 @@ module SpecExpr (
   specExprUnlambda,
   specExprSubst,
   specExprCompile,
-  specExprApply
+  specExprApply,
+  specExprRename
 ) where
 
 import System.IO
@@ -19,6 +20,7 @@ import Text.Parsec           (parse)
 import Text.Parsec.Error     (ParseError, errorMessages)
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
+import Data.Set (fromList)
 
 import Data
 import Parser hiding (context)
@@ -123,7 +125,17 @@ specExprApply = describe "Expr.apply" $ do
     apply context (LargeIdent "UNDEFINED_FUNC" Nothing) [Var x, Var y, Var z]
       `shouldBe` (Var (LargeIdent "UNDEFINED_FUNC" Nothing) :$ Var x :$ Var y :$ Var z)
 
-  --------------------------------------------------------------------------------
+specExprRename = describe "Expr.rename" $ do
+  it "rename reserved Variable" $
+    let reserved = fromList [x, y, z]
+    in  rename reserved x /= x
+
+  it "keep non-reserved Variable" $
+    let reserved = fromList [x, y, z]
+    in  rename reserved n == n
+
+
+--------------------------------------------------------------------------------
 
 x = UniIdent "x"
 y = UniIdent "y"

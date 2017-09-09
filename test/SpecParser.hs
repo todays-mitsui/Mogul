@@ -94,4 +94,4 @@ z = UniIdent "z"
 
 n = UniIdent "n"
 
-ident42 = LargeIdent "" (Just 42)
+ident42 = LargeIdent "42" Nothing

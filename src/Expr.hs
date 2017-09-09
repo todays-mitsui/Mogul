@@ -143,20 +143,12 @@ apply' args es funcBody = foldl (\body (arg, e) -> rewrite arg e body) funcBody 
 
 --------------------------------------------------------------------------------
 
--- rename :: Set Ident -> Ident -> Ident
--- rename reserved v@(Ident s)
---   | not $ v `Set.member` reserved = v
---   | otherwise                     = rename reserved . Ident . renameSymbol $ s
+rename :: Set Ident -> Ident -> Ident
+rename reserved v
+  | not $ v `Set.member` reserved = v
+  | otherwise                     = rename reserved $ rename' v
 
--- renameSymbol :: Text -> Text
--- renameSymbol s
---   | isShortSymbol s = toUpper s <> "0"
---   | otherwise       =
--- where
---   isShortSymbol s = 1 == T.length s && s `T.isInfixOf` lowers
---   lowers = "abcdefghijklmnopqrstuvwxyz"
-
--- increment :: Text -> Text
--- increment s =
---   case s =~~ "[0-9]+$" of
---        Just intStr ->
+rename' :: Ident -> Ident
+rename' (UniIdent   s)          = LargeIdent (T.toUpper s) $ Just 0
+rename' (LargeIdent s Nothing)  = LargeIdent s             $ Just 0
+rename' (LargeIdent s (Just n)) = LargeIdent s             $ Just (n + 1)
