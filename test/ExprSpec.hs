@@ -7,7 +7,8 @@ module ExprSpec (
   specExprSubst,
   specExprCompile,
   specExprApply,
-  specExprRename
+  specExprRename,
+  specExprRewrite
 ) where
 
 import System.IO
@@ -133,6 +134,12 @@ specExprRename = describe "Expr.rename" $ do
   it "keep non-reserved Variable" $
     let reserved = fromList [x, y, z]
     in  rename reserved n == n
+
+specExprRewrite = describe "Expr.rewrite" $ do
+  it "..." $ do
+    let y' = LargeIdent "Y" $ Just 0
+    rewrite x (Var x :$ Var y) (y :^ Var y)
+      `shouldBe` ((y' :^ Var y') :$ Var y)
 
 
 --------------------------------------------------------------------------------

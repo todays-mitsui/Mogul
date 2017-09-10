@@ -123,6 +123,7 @@ varAlias context v = body <$> v `Map.lookup` context
 
 --------------------------------------------------------------------------------
 
+rewrite :: Ident -> Expr -> Expr -> Expr
 rewrite v er el = let (el', er') = sanitize (el, er)
                   in  rewrite' v el' er'
 

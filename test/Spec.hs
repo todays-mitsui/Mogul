@@ -23,6 +23,7 @@ main = hspec $ do
   specExprCompile
   specExprApply
   specExprRename
+  specExprRewrite
 
   specFocusGoLeftOrRightOrUpOrIntoLambda
   specFocusGoUps
