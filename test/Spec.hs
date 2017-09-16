@@ -1,2 +1,32 @@
+{-# LANGUAGE OverloadedStrings #-}
+
+import Test.Hspec
+
+import ParserSpec
+import ExprSpec
+import FocusSpec
+import PPrintSpec
+
+
 main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+main = hspec $ do
+  specParserIdent
+  specParserExpr
+  specParserDef
+  specParserContext
+  specParserLineComment
+
+  specExprIsFreeIn
+  specExprResolve
+  specExprUnlambda
+  specExprSubst
+  specExprCompile
+  specExprApply
+  specExprRename
+  specExprRewrite
+
+  specFocusGoLeftOrRightOrUpOrIntoLambda
+  specFocusGoUps
+  specFocusGoRoot
+
+  specPPrintPp

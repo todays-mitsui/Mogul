@@ -9,21 +9,24 @@ module Parser (
 import Control.Monad (void)
 import Control.Applicative hiding ((<|>), many)
 import qualified Data.Map.Lazy as Map
-import Data.ByteString.Char8 (ByteString, singleton, pack)
-import Text.Parsec hiding (token)
-import Text.Parsec.ByteString
+import qualified Data.Text as T
+import Data.Text (Text, pack, singleton)
 
-import Expr
+import Text.Parsec hiding (token)
+import Text.Parsec.Text
+
+import Data
+-- import Expr
 
 
 ident :: Parser Ident
 ident = ident' <|> ident''
 
 ident' :: Parser Ident
-ident' = Ident . singleton <$> lower
+ident' = UniIdent . singleton <$> lower
 
 ident'' :: Parser Ident
-ident'' = Ident . pack <$> many1 (upper <|> digit <|> char '_')
+ident'' = (\s -> LargeIdent s Nothing) . pack <$> many1 (upper <|> digit <|> char '_')
 
 --------------------------------------------------------------------------------
 
@@ -69,16 +72,15 @@ defFunc' = do
   return (funcName, arg:args)
 
 -- | 関数定義
-def :: Parser (Ident, Function)
+def :: Parser (Ident, Func)
 def = do
-  (f, args) <- token defFunc
+  (f, reversedArgs) <- token defFunc
   token $ char '='
   e <- token expr
   spaces'
   skipMany lineComment
   void endOfLine <|> eof
-  let fullExpr = foldl (flip (:^)) e args -- 左辺にある args を右辺に移して　Lambda を作成
-  return (f, Function (length args) fullExpr)
+  return (f, Func (reverse reversedArgs) e)
 
 -- | 関数定義の組
 context :: Parser Context

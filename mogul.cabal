@@ -16,13 +16,14 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Lib
+                     , Data
                      , Expr
                      , Parser
                      , PPrint
                      , Focus
                      , Eval
   build-depends:       base >= 4.7 && < 5
-                     , bytestring
+                     , text
                      , containers
                      , parsec3
                      , mtl
@@ -34,7 +35,7 @@ executable mogul-exe
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , mogul
-                     , bytestring
+                     , text
                      , containers
                      , parsec3
                      , mtl
@@ -44,9 +45,14 @@ test-suite mogul-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  other-modules:       ParserSpec
+                     , ExprSpec
+                     , FocusSpec
+                     , PPrintSpec
   build-depends:       base
+                     , hspec
                      , mogul
-                     , bytestring
+                     , text
                      , containers
                      , parsec3
                      , mtl
