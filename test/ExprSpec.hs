@@ -116,10 +116,10 @@ specExprCompile = describe "Expr.compile" $ do
       `shouldBe` (s :$ i :$ i)
 
 specExprApply = describe "Expr.apply" $ do
-  it "can call Func with given Args" $ do
-    Right context <- liftIO readSampleContext
-    apply context (LargeIdent "FLIP" Nothing) [Var (LargeIdent "F" Nothing), Var (LargeIdent "X" Nothing), Var (LargeIdent "Y" Nothing)]
-      `shouldBe` (Var (LargeIdent "F" Nothing) :$ Var (LargeIdent "Y" Nothing) :$ Var (LargeIdent "X" Nothing))
+  -- it "can call Func with given Args" $ do
+  --   Right context <- liftIO readSampleContext
+  --   apply context (LargeIdent "FLIP" Nothing) [Var (LargeIdent "F" Nothing), Var (LargeIdent "X" Nothing), Var (LargeIdent "Y" Nothing)]
+  --     `shouldBe` (Var (LargeIdent "F" Nothing) :$ Var (LargeIdent "Y" Nothing) :$ Var (LargeIdent "X" Nothing))
 
   it "can call Undefined Variable also" $ do
     Right context <- liftIO readSampleContext
