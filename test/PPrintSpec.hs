@@ -19,12 +19,12 @@ specPPrintPp = describe "PPrint.pp" $ do
 
     context "when pp(FOO :$ BAR :$ BUZ)" $ do
       it "return '``FOO BAR BUZ'" $ do
-        pp (Var (LargeIdent "FOO" Nothing) :$ Var (LargeIdent "BAR" Nothing) :$ Var (LargeIdent "BUZ" Nothing))
+        pp (var "FOO" :$ var "BAR"  :$ var "BUZ")
           `shouldBe` "``FOO BAR BUZ"
 
     context "when pp(s :$ _ :$ _)" $ do
       it "return '``s_ _'" $ do
-        pp (s :$ Var (LargeIdent "_" Nothing) :$ Var (LargeIdent "_" Nothing))
+        pp (s :$ var "_" :$ var "_")
           `shouldBe` "``s_ _"
 
     context "when pp(Func [y, x] (y :$ x))" $ do
@@ -34,16 +34,16 @@ specPPrintPp = describe "PPrint.pp" $ do
 
     context "when pp((s, Func [z, y, x] (x :$ z :$ (y :$ z))))" $ do
       it "return 's=^x.^y.^z.``xz`yz'" $ do
-        pp (UniIdent "s", Func [z, y, x] $ Var x :$ Var z :$ (Var y :$ Var z))
+        pp (Ident "s", Func [z, y, x] $ Var x :$ Var z :$ (Var y :$ Var z))
           `shouldBe` "s=^x.^y.^z.``xz`yz"
 
 --------------------------------------------------------------------------------
 
-x = UniIdent "x"
-y = UniIdent "y"
-z = UniIdent "z"
+x = Ident "x"
+y = Ident "y"
+z = Ident "z"
 
-n = UniIdent "n"
+n = Ident "n"
 
 f = s :$ k :$ k
 g = k :$ i

@@ -15,7 +15,8 @@ import Data.Text (Text, pack, singleton)
 import Text.Parsec hiding (token)
 import Text.Parsec.Text
 
-import Data
+import Data (Ident(..), Expr(..), Func(..), Context)
+import qualified Data as D
 -- import Expr
 
 
@@ -23,10 +24,10 @@ ident :: Parser Ident
 ident = ident' <|> ident''
 
 ident' :: Parser Ident
-ident' = UniIdent . singleton <$> lower
+ident' = Ident . singleton <$> lower
 
 ident'' :: Parser Ident
-ident'' = (\s -> LargeIdent s Nothing) . pack <$> many1 (upper <|> digit <|> char '_')
+ident'' = Ident . pack <$> many1 (upper <|> digit <|> char '_')
 
 --------------------------------------------------------------------------------
 

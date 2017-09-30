@@ -3,7 +3,7 @@
 import Test.Hspec
 
 import ParserSpec
-import ExprSpec
+-- import ExprSpec
 import FocusSpec
 import PPrintSpec
 
@@ -16,14 +16,14 @@ main = hspec $ do
   specParserContext
   specParserLineComment
 
-  specExprIsFreeIn
-  specExprResolve
-  specExprUnlambda
-  specExprSubst
-  specExprCompile
-  specExprApply
-  specExprRename
-  specExprRewrite
+  -- specExprIsFreeIn
+  -- specExprResolve
+  -- specExprUnlambda
+  -- specExprSubst
+  -- specExprCompile
+  -- specExprApply
+  -- specExprRename
+  -- specExprRewrite
 
   specFocusGoLeftOrRightOrUpOrIntoLambda
   specFocusGoUps

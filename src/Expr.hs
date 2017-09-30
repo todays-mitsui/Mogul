@@ -124,8 +124,9 @@ varAlias context v = body <$> v `Map.lookup` context
 --------------------------------------------------------------------------------
 
 rewrite :: Ident -> Expr -> Expr -> Expr
-rewrite v er el = let (el', er') = sanitize (el, er)
-                  in  rewrite' v el' er'
+-- rewrite v er el = let (el', er') = sanitize (el, er)
+--                   in  rewrite' v el' er'
+rewrite = rewrite'
 
 -- | 式の書き換えを実行 (^x.M)N => M[x:=N]
 rewrite' :: Ident -> Expr -> Expr -> Expr
@@ -135,10 +136,10 @@ rewrite' v e w@(Var w')
 rewrite' v e (v' :^ e' ) = v' :^ rewrite' v e e'
 rewrite' v e (e' :$ e'') = rewrite' v e e' :$ rewrite' v e e''
 
-sanitize :: (Expr, Expr) -> (Expr, Expr)
-sanitize (el, er) = let freel = collectFreeVars el
-                        freer = collectFreeVars er
-                    in  (alphaConv freer el, alphaConv freel er)
+-- sanitize :: (Expr, Expr) -> (Expr, Expr)
+-- sanitize (el, er) = let freel = collectFreeVars el
+--                         freer = collectFreeVars er
+--                     in  (alphaConv freer el, alphaConv freel er)
 
 --------------------------------------------------------------------------------
 
@@ -154,39 +155,39 @@ apply' args es funcBody = foldl (\body (arg, e) -> rewrite arg e body) funcBody 
 
 --------------------------------------------------------------------------------
 
-rename :: Set Ident -> Ident -> Ident
-rename reserved v
-  | not $ v `Set.member` reserved = v
-  | otherwise                     = rename reserved $ rename' v
-
-rename' :: Ident -> Ident
-rename' (UniIdent   s)          = LargeIdent (T.toUpper s) $ Just 0
-rename' (LargeIdent s Nothing)  = LargeIdent s             $ Just 0
-rename' (LargeIdent s (Just n)) = LargeIdent s             $ Just (n + 1)
+-- rename :: Set Ident -> Ident -> Ident
+-- rename reserved v
+--   | not $ v `Set.member` reserved = v
+--   | otherwise                     = rename reserved $ rename' v
+--
+-- rename' :: Ident -> Ident
+-- rename' (UniIdent   s)          = LargeIdent (T.toUpper s) $ Just 0
+-- rename' (LargeIdent s Nothing)  = LargeIdent s             $ Just 0
+-- rename' (LargeIdent s (Just n)) = LargeIdent s             $ Just (n + 1)
 
 --------------------------------------------------------------------------------
 
-alphaConv :: Set Ident -> Expr -> Expr
-alphaConv prohibitedVars e = let reservedVars = prohibitedVars `union `collectVars e
-                             in  alphaConv' prohibitedVars reservedVars e
-
-alphaConv' :: Set Ident -> Set Ident -> Expr -> Expr
-alphaConv' prohibitedVars reservedVars (v :^ e)
-  | v `Set.member` prohibitedVars = let v' = rename reservedVars v
-                                    in  v' :^ alphaConv' prohibitedVars reservedVars (replace v v' e)
-  | otherwise                     = v :^ alphaConv' prohibitedVars reservedVars e
-alphaConv' prohibitedVars reservedVars (e :$ e')
-  = alphaConv' prohibitedVars reservedVars e :$ alphaConv' prohibitedVars reservedVars e'
-alphaConv' _ _ v@(Var _) = v
-
-replace :: Ident -> Ident -> Expr -> Expr
-replace v v'   (e   :$ e') = replace v v' e :$ replace v v' e
-replace v v' l@(v'' :^ e)
-  | v == v''  = l
-  | otherwise = v'' :^ replace v v' e
-replace v v' (Var v'')
-  | v == v''  = Var v'
-  | otherwise = Var v''
+-- alphaConv :: Set Ident -> Expr -> Expr
+-- alphaConv prohibitedVars e = let reservedVars = prohibitedVars `union `collectVars e
+--                              in  alphaConv' prohibitedVars reservedVars e
+--
+-- alphaConv' :: Set Ident -> Set Ident -> Expr -> Expr
+-- alphaConv' prohibitedVars reservedVars (v :^ e)
+--   | v `Set.member` prohibitedVars = let v' = rename reservedVars v
+--                                     in  v' :^ alphaConv' prohibitedVars reservedVars (replace v v' e)
+--   | otherwise                     = v :^ alphaConv' prohibitedVars reservedVars e
+-- alphaConv' prohibitedVars reservedVars (e :$ e')
+--   = alphaConv' prohibitedVars reservedVars e :$ alphaConv' prohibitedVars reservedVars e'
+-- alphaConv' _ _ v@(Var _) = v
+--
+-- replace :: Ident -> Ident -> Expr -> Expr
+-- replace v v'   (e   :$ e') = replace v v' e :$ replace v v' e
+-- replace v v' l@(v'' :^ e)
+--   | v == v''  = l
+--   | otherwise = v'' :^ replace v v' e
+-- replace v v' (Var v'')
+--   | v == v''  = Var v'
+--   | otherwise = Var v''
 
 --------------------------------------------------------------------------------
 

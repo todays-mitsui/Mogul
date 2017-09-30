@@ -144,11 +144,11 @@ specExprRewrite = describe "Expr.rewrite" $ do
 
 --------------------------------------------------------------------------------
 
-x = UniIdent "x"
-y = UniIdent "y"
-z = UniIdent "z"
+x = ident "x"
+y = ident "y"
+z = ident "z"
 
-n = UniIdent "n"
+n = ident "n"
 
 f = s :$ k :$ k
 g = k :$ i

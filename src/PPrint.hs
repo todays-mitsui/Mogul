@@ -55,9 +55,9 @@ prepara' acc (Var x)   = symbol x : acc
 
 
 symbol :: Ident -> Phrase
-symbol (UniIdent   x)          = Symbol x
-symbol (LargeIdent x Nothing ) = LargeSymbol x
-symbol (LargeIdent x (Just n)) = LargeSymbol (x <> pack (show n))
+symbol v@(Ident x)
+  | isUniIdent v = Symbol x
+  | otherwise    = LargeSymbol x
 
 --------------------------------------------------------------------------------
 

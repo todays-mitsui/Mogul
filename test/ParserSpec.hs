@@ -22,7 +22,7 @@ import qualified Data.Text as T
 import qualified Data.Map.Lazy as Map
 
 import Data
-import Parser hiding (context)
+import Parser hiding (context, ident)
 import qualified Parser as P
 
 
@@ -33,13 +33,13 @@ instance Eq ParseError where
 
 specParserIdent = describe "Parser.ident" $ do
   it "can parse single letter identifier, ex. 'x'" $ do
-    parse ident "" "x" `shouldBe` Right (UniIdent "x")
+    parse P.ident "" "x" `shouldBe` Right (Ident "x")
 
   it "can parse multi letter identifier, ex. 'FOO_BAR'" $ do
-    parse ident "" "FOO_BAR" `shouldBe` Right (LargeIdent "FOO_BAR" Nothing)
+    parse P.ident "" "FOO_BAR" `shouldBe` Right (Ident "FOO_BAR")
 
   it "can parse digit letter identifier, ex. '42'" $ do
-    parse ident "" "42" `shouldBe` Right ident42
+    parse P.ident "" "42" `shouldBe` Right ident42
 
 
 specParserExpr = describe "Parser.expr" $ do
@@ -66,7 +66,7 @@ specParserExpr = describe "Parser.expr" $ do
 specParserDef = describe "Parser.def" $ do
     it "can parse Ident define" $ do
       let src = intercalate (singleton '\n') ["``kxy = y", "```sxyz = ``xz`yz", "i = ``skk"]
-      parse def "" src `shouldBe` Right (UniIdent "k", Func [x, y] (Var y))
+      parse def "" src `shouldBe` Right (Ident "k", Func [x, y] (Var y))
 
 
 specParserContext = describe "Parser.context" $ do
@@ -75,9 +75,9 @@ specParserContext = describe "Parser.context" $ do
       parse P.context "" src
         `shouldBe` Right (
             Map.fromList [
-              (UniIdent "i", Func [] (Var (UniIdent "s") :$ Var (UniIdent "k") :$ Var (UniIdent "k"))),
-              (UniIdent "k", Func [x, y] (Var y)),
-              (UniIdent "s", Func [x, y, z] (Var x :$ Var z :$ (Var y :$ Var z)))
+              (Ident "i", Func [] (Var (Ident "s") :$ Var (Ident "k") :$ Var (Ident "k"))),
+              (Ident "k", Func [x, y] (Var y)),
+              (Ident "s", Func [x, y, z] (Var x :$ Var z :$ (Var y :$ Var z)))
             ]
           )
 
@@ -88,10 +88,10 @@ specParserLineComment = describe "Parser.lineComment" $ do
 
 --------------------------------------------------------------------------------
 
-x = UniIdent "x"
-y = UniIdent "y"
-z = UniIdent "z"
+x = Ident "x"
+y = Ident "y"
+z = Ident "z"
 
-n = UniIdent "n"
+n = Ident "n"
 
-ident42 = LargeIdent "42" Nothing
+ident42 = Ident "42"
