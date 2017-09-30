@@ -24,7 +24,11 @@ import qualified Data.Set      as Set
 import Data.Map.Lazy           (Map, (!))
 import qualified Data.Map.Lazy as Map
 
-
+-- | 識別子
+-- |
+-- | 有効な識別子は英小文字1文字から成るもの (ex. a,b,..,z)
+-- | または、英大文字,アンダースコア(_),数字(0..9) の1文字以上の列
+-- | ただし、有効な識別子のみ生成されるよう保証するのは Parser の役割とする
 data Ident = Ident Text
              deriving (Eq, Ord, Show, Read)
 
@@ -37,12 +41,14 @@ isLargeIdent = not . isUniIdent
 
 --------------------------------------------------------------------------------
 
-infixl 9 :$
-infixr 7 :^
+-- | λ式
 data Expr = Expr :$ Expr
             | Ident :^ Expr
             | Var Ident
             deriving (Eq, Show, Read)
+
+infixl 9 :$
+infixr 7 :^
 
 var :: Text -> Expr
 var = Var . Ident
