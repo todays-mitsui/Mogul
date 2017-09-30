@@ -1,4 +1,4 @@
-name:                Mogul
+name:                mogul
 version:             0.1.0.0
 -- synopsis:
 description:         An interpreter that evaluates λ-calculations step by step.
