@@ -1,36 +1,38 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Data (
-  Ident(..),
-  isUniIdent,
-  isLargeIdent,
+module Data
+    (
+      Ident(..)
+    , isUniIdent
+    , isLargeIdent
 
-  Expr(..),
-  var,
+    , Expr(..)
+    , var
 
-  Func(Func, bareExpr),
-  arity, body,
+    , Func(Func, bareExpr)
+    , arity, body
 
-  Context,
-  emptyContext,
+    , Context
+    , emptyContext
 
-  s, k, i
- ) where
+    , s, k, i
+    ) where
 
-import Data.Char               (isLower)
-import Data.Text               (Text)
+import Data.Text                  (Text)
 import qualified Data.Text     as T
-import Data.Set                (Set)
+import Data.Char                  (isLower)
+import Data.Set                   (Set)
 import qualified Data.Set      as Set
-import Data.Map.Lazy           (Map, (!))
+import Data.Map.Lazy              (Map, (!))
 import qualified Data.Map.Lazy as Map
+
 
 -- | 識別子
 -- |
 -- | 有効な識別子は英小文字1文字から成るもの (ex. a,b,..,z)
 -- | または、英大文字,アンダースコア(_),数字(0..9) の1文字以上の列
 -- | ただし、有効な識別子のみ生成されるよう保証するのは Parser の役割とする
-data Ident = Ident Text
+data Ident = Ident !Text
   deriving (Eq, Ord, Show, Read)
 
 isUniIdent :: Ident -> Bool
@@ -43,9 +45,9 @@ isLargeIdent = not . isUniIdent
 --------------------------------------------------------------------------------
 
 -- | λ式
-data Expr = Var Ident      -- 変数
-          | Ident :^ Expr  -- 関数抽象
-          | Expr  :$ Expr  -- 関数適用
+data Expr = Var !Ident     -- 変数
+          | !Ident :^ Expr  -- 関数抽象
+          | Expr   :$ Expr  -- 関数適用
   deriving (Eq, Show, Read)
 
 infixl 9 :$
@@ -58,9 +60,9 @@ var = Var . Ident
 
 -- | 無名関数
 data Func = Func
-  { args     :: [Ident]  -- 項数
-  , bareExpr :: Expr
-  } deriving (Eq, Show, Read)
+    { args     :: [Ident]  -- 項数
+    , bareExpr :: Expr
+    } deriving (Eq, Show, Read)
 
 arity :: Func -> Int
 arity = length . args

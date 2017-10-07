@@ -2,21 +2,21 @@
 
 module Main where
 
-
 import System.IO                 (IOMode (..), openFile, hSetEncoding, utf8)
+import qualified Data.Text     as T
+import qualified Data.Text.IO  as T
+import Data.Functor ((<$>))
 import Control.Monad             (forever)
-import qualified Data.Text    as T
-import qualified Data.Text.IO as TIO
+import Text.Parsec (parse)
 
 import Data
 -- import Expr
 -- import Eval
 
-import Data.Functor ((<$>))
-import Text.Parsec (parse)
 import Parser      (context, expr, def)
 import PPrint      (pp)
 import Focus       (goRoot)
+
 
 main :: IO ()
 -- main = case parse def "" "```sxyz = ``xz`yz" of
@@ -42,12 +42,11 @@ main = do
 
 skk = parse expr "" "```skka"
 
-
 loadContext :: String -> IO Context
 loadContext filepath = do
   h <- openFile filepath ReadMode
   hSetEncoding h utf8
-  eitherContext <- parse context "" <$> TIO.hGetContents h
+  eitherContext <- parse context "" <$> T.hGetContents h
   case eitherContext of
        Left  parseError -> do putStrLn . show $ parseError
                               return emptyContext
