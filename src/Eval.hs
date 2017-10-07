@@ -43,7 +43,7 @@ eval context f@(_ :$ _    , depth, bcs) = eval context =<< goLeft f
 -- isBetaNF context (e :$ e')         = undefined
 
 rank_ :: Context -> Ident -> Maybe Int
-rank_ context v = length . args <$> v `Map.lookup` context
+rank_ context v = arity <$> v `Map.lookup` context
 
 getAlias :: Context -> Ident -> Maybe Expr
 getAlias context v

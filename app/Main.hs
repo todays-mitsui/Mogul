@@ -3,13 +3,14 @@
 module Main where
 
 
-import Control.Monad (forever)
+import System.IO                 (IOMode (..), openFile, hSetEncoding, utf8)
+import Control.Monad             (forever)
 import qualified Data.Text    as T
 import qualified Data.Text.IO as TIO
 
 import Data
-import Expr
-import Eval
+-- import Expr
+-- import Eval
 
 import Data.Functor ((<$>))
 import Text.Parsec (parse)
@@ -22,30 +23,31 @@ main :: IO ()
 --             Left  parseError -> putStrLn . show $ parseError
 --             Right parsedExpr -> putStrLn . pp $ parsedExpr
 main = do
-  c <- loadContext $ Just "default.context"
+  c <- loadContext "default.context"
   putStrLn . pp $ c
-  forever $ do
-    putStrLn "Input Lambda term:"
-    putStr "> "
-    input <- TIO.getLine
-    case parse expr "" input of
-      Left  parseError -> putStrLn . show $ parseError
-      Right e          -> do putStrLn . pp $ e
-                             mapM_ (putStrLn . pp) (reverse $ evals c e)
-    putStrLn ""
+  -- forever $ do
+  --   putStrLn "Input Lambda term:"
+  --   putStr "> "
+  --   input <- TIO.getLine
+  --   case parse expr "" input of
+  --     Left  parseError -> putStrLn . show $ parseError
+  --     Right e          -> do putStrLn . pp $ e
+  --                            mapM_ (putStrLn . pp) (reverse $ evals c e)
+  --   putStrLn ""
 
-  putStrLn ""
-  let Right x = skk
-  putStrLn . pp $ x
-  mapM_ (putStrLn . pp) (reverse $ evals c x)
+  -- putStrLn ""
+  -- let Right x = skk
+  -- putStrLn . pp $ x
+  -- mapM_ (putStrLn . pp) (reverse $ evals c x)
 
 skk = parse expr "" "```skka"
 
 
-loadContext :: Maybe String -> IO Context
-loadContext Nothing         = return emptyContext
-loadContext (Just filepath) = do
-  eitherContext <- parse context "" <$> TIO.readFile filepath
+loadContext :: String -> IO Context
+loadContext filepath = do
+  h <- openFile filepath ReadMode
+  hSetEncoding h utf8
+  eitherContext <- parse context "" <$> TIO.hGetContents h
   case eitherContext of
        Left  parseError -> do putStrLn . show $ parseError
                               return emptyContext

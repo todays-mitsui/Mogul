@@ -4,10 +4,10 @@
 module PPrint (pp) where
 
 
-import Data.Monoid ((<>))
+import Data.Monoid            ((<>))
 import qualified Data.Text as T
-import Data.Text (Text, pack, unpack)
-import Data.Map.Lazy (foldrWithKey)
+import Data.Text              (Text, pack, unpack)
+import Data.Map.Lazy          (foldrWithKey)
 
 import Data
 import Expr
@@ -24,7 +24,7 @@ instance PPrintable Expr where
   prepara = prepara' []
 
 instance PPrintable Func where
-  prepara (Func args e) = prepara $ foldl (flip (:^)) e args
+  prepara = prepara . body
 
 instance PPrintable (Ident, Func) where
   prepara (v, f) = symbol v : Equal : prepara f

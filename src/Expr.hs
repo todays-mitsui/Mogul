@@ -115,7 +115,7 @@ canReduct context argCount (e :$ e')
 
 -- | 変数のランクを取得
 varRank :: Context -> Ident -> Maybe Int
-varRank context v = length . args <$> v `Map.lookup` context
+varRank context v = arity <$> v `Map.lookup` context
 
 -- | 変数の実体を取得
 varAlias :: Context -> Ident -> Maybe Expr
@@ -147,7 +147,7 @@ rewrite' v e (e' :$ e'') = rewrite' v e e' :$ rewrite' v e e''
 -- | TODO: α変換を考慮する
 apply :: Context -> Ident -> [Expr] -> Expr
 apply context v es = case v `Map.lookup` context of
-                            Just (Func args funcBody) -> apply' args es funcBody
+                            Just (Func args funcBody) -> undefined -- apply' args es funcBody
                             Nothing                   -> foldl (:$) (Var v) es
 
 apply' :: [Ident] -> [Expr] -> Expr -> Expr

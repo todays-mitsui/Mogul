@@ -8,7 +8,8 @@ module Data (
   Expr(..),
   var,
 
-  Func(..),
+  Func(Func, bareExpr),
+  arity, body,
 
   Context,
   emptyContext,
@@ -30,7 +31,7 @@ import qualified Data.Map.Lazy as Map
 -- | または、英大文字,アンダースコア(_),数字(0..9) の1文字以上の列
 -- | ただし、有効な識別子のみ生成されるよう保証するのは Parser の役割とする
 data Ident = Ident Text
-             deriving (Eq, Ord, Show, Read)
+  deriving (Eq, Ord, Show, Read)
 
 isUniIdent :: Ident -> Bool
 isUniIdent (Ident x) = (T.length x == 1) && (isLower . T.head $ x)
@@ -42,10 +43,10 @@ isLargeIdent = not . isUniIdent
 --------------------------------------------------------------------------------
 
 -- | λ式
-data Expr = Expr :$ Expr
-            | Ident :^ Expr
-            | Var Ident
-            deriving (Eq, Show, Read)
+data Expr = Var Ident      -- 変数
+          | Ident :^ Expr  -- 関数抽象
+          | Expr  :$ Expr  -- 関数適用
+  deriving (Eq, Show, Read)
 
 infixl 9 :$
 infixr 7 :^
@@ -53,13 +54,23 @@ infixr 7 :^
 var :: Text -> Expr
 var = Var . Ident
 
--- | 引数の長さを保持した無名関数
-data Func = Func {
-              args :: [Ident],
-              body :: Expr
-            }
-            deriving (Eq, Show, Read)
+--------------------------------------------------------------------------------
 
+-- | 無名関数
+data Func = Func
+  { args     :: [Ident]  -- 項数
+  , bareExpr :: Expr
+  } deriving (Eq, Show, Read)
+
+arity :: Func -> Int
+arity = length . args
+
+body :: Func -> Expr
+body (Func vs e) = foldr (:^) e vs
+
+--------------------------------------------------------------------------------
+
+-- | 関数定義の集合
 type Context = Map Ident Func
 
 emptyContext = Map.empty
