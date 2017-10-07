@@ -91,8 +91,8 @@ apply = do
 -- | 関数定義の左辺部 "```f x y z" の形だけを許す
 defFunc :: Parser (Ident, [Ident])
 defFunc = defFunc' <|> do
-    v <- token ident
-    return (v, [])
+    funcName <- token ident
+    return (funcName, [])
 
 defFunc' :: Parser (Ident, [Ident])
 defFunc' = do
@@ -104,13 +104,13 @@ defFunc' = do
 -- | 関数定義
 def :: Parser (Ident, Func)
 def = do
-    (f, reversedArgs) <- token defFunc
+    (funcName, reversedArgs) <- token defFunc
     token $ char '='
     e <- token expr
     spaces'
     skipMany lineComment
     void endOfLine <|> eof
-    return (f, Func (reverse reversedArgs) e)
+    return (funcName, Func (reverse reversedArgs) e)
 
 -- | コンテキスト (関数定義の組)
 context :: Parser Context
