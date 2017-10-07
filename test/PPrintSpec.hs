@@ -23,9 +23,9 @@ specPPrintPp = describe "PPrint.pp" $ do
           `shouldBe` "``FOO BAR BUZ"
 
     context "when pp(s :$ _ :$ _)" $ do
-      it "return '``s_ _'" $ do
+      it "return '``s _ _'" $ do
         pp (s :$ var "_" :$ var "_")
-          `shouldBe` "``s_ _"
+          `shouldBe` "``s _ _"
 
     context "when pp(Func [x, y] (y :$ x))" $ do
       it "return '^x.^y.`yx'" $ do
