@@ -60,7 +60,7 @@ var = Var . Ident
 
 -- | 無名関数
 data Func = Func
-    { args     :: [Ident]  -- 項数
+    { args     :: [Ident]
     , bareExpr :: Expr
     } deriving (Eq, Show, Read)
 
