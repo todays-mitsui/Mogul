@@ -37,7 +37,6 @@ data Ident = Ident !Text
 
 isUniIdent :: Ident -> Bool
 isUniIdent (Ident x) = (T.length x == 1) && (isLower . T.head $ x)
-  where lowers = "abcdefghijklmnopqrstuvwxyz"
 
 isLargeIdent :: Ident -> Bool
 isLargeIdent = not . isUniIdent
