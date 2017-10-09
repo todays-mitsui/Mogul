@@ -17,7 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Lib
                      , Data
-                     -- , Expr
+                     , Expr
                      , Parser
                      , PPrint
                      , Focus

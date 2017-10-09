@@ -28,26 +28,35 @@ compile context (e :$ e')          = compile context e :$ compile context e'
 
 --------------------------------------------------------------------------------
 
+-- | 式中の全ての関数抽象をSKコンビネーターに展開する
+-- | ex. ^.^.`01 =={unlambda}==> ``s`k`sik
 unlambda :: Expr -> Expr
-unlambda v@(Var Nothing  _) = k :$ v
-unlambda v@(Var (Just n) x)
+unlambda e@(Var _ _) = e
+unlambda (e :$ e')   = unlambda e :$ unlambda e'
+unlambda (x :^ e)    = unlambda $ resolve e
+
+-- | 関数抽象の本体部を再帰的にSKコンビネーターに展開する
+-- | ex. ^.^.`01 ==> resolve(resolve(`01)) ==> ``s`k`sik
+resolve :: Expr -> Expr
+resolve v@(Var Nothing  _) = k :$ v
+resolve v@(Var (Just n) x)
     -- ^x.x === i
     | n == 0                = i
     -- ^x.y === `ky
     | otherwise             = k :$ liftIndexes v
-unlambda e@(e' :$ v@(Var n y))
+resolve e@(e' :$ v@(Var n y))
     -- ^x.M === `kM
     | not (0 `exists` e)    = k :$ liftIndexes e
     -- ^x.MN === ``s^x.N^x.N
-    | 0 `exists` e'         = s :$ unlambda e' :$ unlambda v
+    | 0 `exists` e'         = s :$ resolve e' :$ resolve v
     -- ^x.Mx === M
     | otherwise             = liftIndexes e'
-unlambda e@(e' :$ e'')
+resolve e@(e' :$ e'')
     -- ^x.M === `kM
     | not (0 `exists` e)    = k :$ liftIndexes e
     -- ^x.MN === ``s^x.N^x.N
-    | otherwise             = s :$ unlambda e' :$ unlambda e''
-unlambda (_ :^ e')          = unlambda $ unlambda e'
+    | otherwise             = s :$ resolve e' :$ resolve e''
+resolve l@(_ :^ _)          = resolve $ unlambda l
 
 
 exists :: Index -> Expr -> Bool
@@ -62,11 +71,6 @@ liftIndexes (Var (Just n) x)  = Var (Just $ n - 1) x
 liftIndexes (e :$ e')         = liftIndexes e :$ liftIndexes e'
 liftIndexes (v :^ e )         = v :^ liftIndexes e
 
--- -- | 式中の全てのλ抽象をSKコンビネーターに展開する
--- unlambda :: Expr -> Expr
--- unlambda e@(Var _ _) = e
--- unlambda (e :$ e')   = unlambda e :$ unlambda e'
--- unlambda (x :^ e)    = unlambda $ resolve e
 --
 --
 --
@@ -180,29 +184,29 @@ subst context (v :^ e )          = v :^ subst context e
 --
 -- eval context
 
-canReduct :: Context -> Int -> Expr -> Bool
-canReduct context argCount (Var (Just _) _)
-    = False
-canReduct context argCount (Var Nothing  x)
-    = case varRank context x of
-           Just rank -> rank >= argCount
-           Nothing   -> False
+-- canReduct :: Context -> Int -> Expr -> Bool
+-- canReduct context argCount (Var (Just _) _)
+--     = False
+-- canReduct context argCount (Var Nothing  x)
+--     = case varRank context x of
+--            Just rank -> rank >= argCount
+--            Nothing   -> False
 
-canReduct context argCount (_ :^ _ )
-    = argCount >= 1
+-- canReduct context argCount (_ :^ _ )
+--     = argCount >= 1
 
-canReduct context argCount (e :$ e')
-    = canReduct context (argCount+1) e || canReduct context 0 e'
+-- canReduct context argCount (e :$ e')
+--     = canReduct context (argCount+1) e || canReduct context 0 e'
 
 --------------------------------------------------------------------------------
 
--- | 変数のランクを取得
-varRank :: Context -> Ident -> Maybe Int
-varRank context v = arity <$> v `Map.lookup` context
+-- -- | 変数のランクを取得
+-- varRank :: Context -> Ident -> Maybe Int
+-- varRank context v = arity <$> v `Map.lookup` context
 
--- | 変数の実体を取得
-varAlias :: Context -> Ident -> Maybe Expr
-varAlias context v = body <$> v `Map.lookup` context
+-- -- | 変数の実体を取得
+-- varAlias :: Context -> Ident -> Maybe Expr
+-- varAlias context v = body <$> v `Map.lookup` context
 
 --------------------------------------------------------------------------------
 
@@ -228,13 +232,13 @@ varAlias context v = body <$> v `Map.lookup` context
 
 -- | 定義済みの関数に規定数の引数を適用して評価する
 -- | TODO: α変換を考慮する
-apply :: Context -> Ident -> [Expr] -> Expr
-apply context v es = case v `Map.lookup` context of
-                            Just (Func args funcBody) -> undefined -- apply' args es funcBody
-                            Nothing                   -> foldl (:$) (Var v) es
+-- apply :: Context -> Ident -> [Expr] -> Expr
+-- apply context v es = case v `Map.lookup` context of
+--                             Just (Func args funcBody) -> undefined -- apply' args es funcBody
+--                             Nothing                   -> foldl (:$) (Var v) es
 
-apply' :: [Ident] -> [Expr] -> Expr -> Expr
-apply' args es funcBody = foldl (\body (arg, e) -> rewrite arg e body) funcBody $ zip args es
+-- apply' :: [Ident] -> [Expr] -> Expr -> Expr
+-- apply' args es funcBody = foldl (\body (arg, e) -> rewrite arg e body) funcBody $ zip args es
 
 --------------------------------------------------------------------------------
 
@@ -274,19 +278,19 @@ apply' args es funcBody = foldl (\body (arg, e) -> rewrite arg e body) funcBody 
 
 --------------------------------------------------------------------------------
 
--- | 式中の変数を全て列挙する
-collectVars :: Expr -> Set Ident
-collectVars (Var v)   = Set.singleton v
-collectVars (e :$ e') = collectVars e `union` collectVars e'
-collectVars (v :^ e)  = collectVars e
+-- -- | 式中の変数を全て列挙する
+-- collectVars :: Expr -> Set Ident
+-- collectVars (Var v)   = Set.singleton v
+-- collectVars (e :$ e') = collectVars e `union` collectVars e'
+-- collectVars (v :^ e)  = collectVars e
 
--- | 式中の自由変数を全て列挙する
-collectFreeVars :: Expr -> Set Ident
-collectFreeVars = collectFreeVars' Set.empty
+-- -- | 式中の自由変数を全て列挙する
+-- collectFreeVars :: Expr -> Set Ident
+-- collectFreeVars = collectFreeVars' Set.empty
 
-collectFreeVars' :: Set Ident -> Expr -> Set Ident
-collectFreeVars' vs (Var v)
-  | v `Set.member` vs         = Set.empty
-  | otherwise                 = Set.singleton v
-collectFreeVars' vs (e :$ e') = collectFreeVars' vs e `union` collectFreeVars' vs e'
-collectFreeVars' vs (v :^ e)  = collectFreeVars' (v `insert` vs) e
+-- collectFreeVars' :: Set Ident -> Expr -> Set Ident
+-- collectFreeVars' vs (Var v)
+--   | v `Set.member` vs         = Set.empty
+--   | otherwise                 = Set.singleton v
+-- collectFreeVars' vs (e :$ e') = collectFreeVars' vs e `union` collectFreeVars' vs e'
+-- collectFreeVars' vs (v :^ e)  = collectFreeVars' (v `insert` vs) e
