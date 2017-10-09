@@ -13,7 +13,6 @@ import Data.Text              (Text, pack, unpack)
 import Data.Map.Lazy          (foldrWithKey)
 
 import Data
-import Expr
 
 
 class PPrintable a where
@@ -72,7 +71,7 @@ instance Show Phrase where
 flatten :: [Phrase] -> Expr -> [Phrase]
 flatten acc (e :$ e') = Backquote : flatten (flatten acc e') e
 flatten acc (x :^ e)  = Lambda : symbol x : Dot : flatten acc e
-flatten acc (Var x)   = symbol x : acc
+flatten acc (Var _ x) = symbol x : acc
 
 symbol :: Ident -> Phrase
 symbol v@(Ident x)

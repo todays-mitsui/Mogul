@@ -64,7 +64,7 @@ expr = apply <|> lambda <|> var
 
 -- | 変数
 var :: Parser Expr
-var = Var <$> ident
+var = Var Nothing <$> ident
 
 -- | 関数抽象
 lambda :: Parser Expr

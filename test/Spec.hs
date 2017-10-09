@@ -4,7 +4,7 @@ import Test.Hspec
 
 import ParserSpec
 -- import ExprSpec
-import FocusSpec
+-- import FocusSpec
 import PPrintSpec
 
 
@@ -25,8 +25,8 @@ main = hspec $ do
   -- specExprRename
   -- specExprRewrite
 
-  specFocusGoLeftOrRightOrUpOrIntoLambda
-  specFocusGoUps
-  specFocusGoRoot
+  -- specFocusGoLeftOrRightOrUpOrIntoLambda
+  -- specFocusGoUps
+  -- specFocusGoRoot
 
   specPPrintPp
