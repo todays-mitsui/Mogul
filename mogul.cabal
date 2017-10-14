@@ -47,6 +47,7 @@ test-suite mogul-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       ParserSpec
+                     , DataSpec
                      , ExprSpec
                      , UnlambdaSpec
                      , FocusSpec
