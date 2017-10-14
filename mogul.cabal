@@ -18,10 +18,11 @@ library
   exposed-modules:     Lib
                      , Data
                      , Expr
+                     , Unlambda
                      , Parser
                      , PPrint
                      , Focus
-                     , Eval
+                     -- , Eval
   build-depends:       base >= 4.7 && < 5
                      , text
                      , containers
@@ -47,6 +48,7 @@ test-suite mogul-test
   main-is:             Spec.hs
   other-modules:       ParserSpec
                      , ExprSpec
+                     , UnlambdaSpec
                      , FocusSpec
                      , PPrintSpec
   build-depends:       base

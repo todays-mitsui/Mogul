@@ -6,6 +6,7 @@ module Data
     , isUniIdent
     , isLargeIdent
 
+    , Index
     , Expr(..)
     , var
 
@@ -43,17 +44,27 @@ isLargeIdent = not . isUniIdent
 
 --------------------------------------------------------------------------------
 
+-- | ド・ブラン・インデックス
+type Index = Int
+
 -- | λ式
-data Expr = Var !Ident     -- 変数
-          | !Ident :^ Expr  -- 関数抽象
-          | Expr   :$ Expr  -- 関数適用
-  deriving (Eq, Show, Read)
+data Expr = Var (Maybe Index) !Ident  -- 変数
+          | !Ident :^ Expr            -- 関数抽象
+          | Expr   :$ Expr            -- 関数適用
+  deriving (Show, Read)
 
 infixl 9 :$
 infixr 7 :^
 
+instance Eq Expr where
+    Var (Just x) _ == Var (Just y) _ = x == y
+    Var Nothing  x == Var Nothing  y = x == y
+    _  :^ x        == _  :^ y        = x == y
+    xl :$ xr       == yl :$ yr       = xl == yl && xr == yr
+    _              == _              = False
+
 var :: Text -> Expr
-var = Var . Ident
+var = Var Nothing . Ident
 
 --------------------------------------------------------------------------------
 

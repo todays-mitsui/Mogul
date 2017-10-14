@@ -44,19 +44,19 @@ specParserIdent = describe "Parser.ident" $ do
 
 specParserExpr = describe "Parser.expr" $ do
   it "can parse apply statement, ex. '`xy'" $ do
-    parse expr "" "`xy" `shouldBe` Right (Var x :$ Var y)
+    parse expr "" "`xy" `shouldBe` Right (Var Nothing x :$ Var Nothing y)
 
   it "can parse apply statement, ex. '`42 x'" $ do
-    parse expr "" "`42x" `shouldBe` Right (Var ident42 :$ Var x)
+    parse expr "" "`42x" `shouldBe` Right (Var Nothing ident42 :$ Var Nothing x)
 
   it "can parse lambda abstraction statement, ex. '^x.x'" $ do
-    parse expr "" "^x.x" `shouldBe` Right (x :^ Var x)
+    parse expr "" "^x.x" `shouldBe` Right (x :^ Var Nothing x)
 
   it "can parse lambda abstraction statement, ex. '^42.42'" $ do
-    parse expr "" "^42.42" `shouldBe` Right (ident42 :^ Var ident42)
+    parse expr "" "^42.42" `shouldBe` Right (ident42 :^ Var Nothing ident42)
 
   it "can parse multi variable lambda abstraction statement, '^xy.`yx'" $ do
-    parse expr "" "^xy.`yx" `shouldBe` Right (x :^ y :^ Var y :$ Var x)
+    parse expr "" "^xy.`yx" `shouldBe` Right (x :^ y :^ Var Nothing y :$ Var Nothing x)
 
   context "when parse invalid expression" $ do
     it "return Left ParseError" $
@@ -66,7 +66,7 @@ specParserExpr = describe "Parser.expr" $ do
 specParserDef = describe "Parser.def" $ do
     it "can parse Ident define" $ do
       let src = intercalate (singleton '\n') ["``kxy = y", "```sxyz = ``xz`yz", "i = ``skk"]
-      parse def "" src `shouldBe` Right (Ident "k", Func [x, y] (Var y))
+      parse def "" src `shouldBe` Right (Ident "k", Func [x, y] (Var Nothing y))
 
 
 specParserContext = describe "Parser.context" $ do
@@ -75,9 +75,9 @@ specParserContext = describe "Parser.context" $ do
       parse P.context "" src
         `shouldBe` Right (
             Map.fromList [
-              (Ident "i", Func [] (Var (Ident "s") :$ Var (Ident "k") :$ Var (Ident "k"))),
-              (Ident "k", Func [x, y] (Var y)),
-              (Ident "s", Func [x, y, z] (Var x :$ Var z :$ (Var y :$ Var z)))
+              (Ident "i", Func [] (var "s" :$ var "k" :$ var "k")),
+              (Ident "k", Func [x, y] (var "y")),
+              (Ident "s", Func [x, y, z] (var "x" :$ var "z" :$ (var "y" :$ var "z")))
             ]
           )
 
