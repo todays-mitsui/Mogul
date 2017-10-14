@@ -17,12 +17,12 @@ import Expr
 
 
 class PPrintable a where
-    prepara :: a -> [Phrase]
+    prepara :: a -> [Token]
     pp      :: a -> String
     pp = render . prepara
 
 
-render :: [Phrase] -> String
+render :: [Token] -> String
 render []       = ""
 render (s@(LargeSymbol _) : ps@(LargeSymbol _ : _))
                 = show s <> " " <> render ps
@@ -49,16 +49,16 @@ instance PPrintable Context where
 
 --------------------------------------------------------------------------------
 
-data Phrase = Backquote         -- "`"
-            | Lambda            -- "^"
-            | Dot               -- "."
-            | Equal             -- "="
-            | Symbol Text       -- 英小文字1文字からなるシンボル
-            | LargeSymbol Text  -- 英数字2文字以上からなるシンボル
-            | EOL               -- 行端
+data Token = Backquote         -- "`"
+           | Lambda            -- "^"
+           | Dot               -- "."
+           | Equal             -- "="
+           | Symbol Text       -- 英小文字1文字からなるシンボル
+           | LargeSymbol Text  -- 英数字2文字以上からなるシンボル
+           | EOL               -- 行端
   deriving (Eq)
 
-instance Show Phrase where
+instance Show Token where
     show Backquote       = "`"
     show Lambda          = "^"
     show Dot             = "."
@@ -69,12 +69,12 @@ instance Show Phrase where
 
 --------------------------------------------------------------------------------
 
-flatten :: [Phrase] -> Expr -> [Phrase]
+flatten :: [Token] -> Expr -> [Token]
 flatten acc (e :$ e') = Backquote : flatten (flatten acc e') e
 flatten acc (x :^ e)  = Lambda : symbol x : Dot : flatten acc e
 flatten acc (Var x)   = symbol x : acc
 
-symbol :: Ident -> Phrase
+symbol :: Ident -> Token
 symbol v@(Ident x)
     | isUniIdent v = Symbol x
     | otherwise    = LargeSymbol x
