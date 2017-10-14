@@ -1,11 +1,11 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module ExprSpec
+module UnlambdaSpec
     (
-      specExprExists
+      specUnlambdaExists
     -- , specExprIsFreeIn
     -- , specExprResolve
-    , specExprUnlambda
+    , specUnlambdaUnlambda
     -- , specExprSubst
     -- , specExprCompile
     -- , specExprApply
@@ -28,7 +28,7 @@ import Data.Set (fromList)
 import Data
 import Parser hiding (context)
 import qualified Parser as P
-import Expr
+import Unlambda
 
 
 readSampleContext :: IO (Either ParseError Context)
@@ -39,7 +39,7 @@ readSampleContext = parse P.context "" <$> do
 
   --------------------------------------------------------------------------------
 
-specExprExists = describe "Expr.exists" $ do
+specUnlambdaExists = describe "Unlambda.exists" $ do
   context "when Var exists in expr" $ do
     it "retrun True" $
       (0 `exists` (Var Nothing (Ident "_") :$ (Ident "y" :^ (Var (Just 0) (Ident "_")) :$ (Var (Just 1) (Ident "_"))))) `shouldBe` True
@@ -74,7 +74,7 @@ specExprExists = describe "Expr.exists" $ do
 --       `shouldBe` (s :$ resolve x (f :$ Var x) :$ resolve x (g :$ Var x))
 
 
-specExprUnlambda = describe "Expr.unlambda" $ do
+specUnlambdaUnlambda = describe "Unlambda.unlambda" $ do
   it "resolve ^x.x to i" $ do
     unlambda (x :^ Var (Just 0) x) `shouldBe` i
 

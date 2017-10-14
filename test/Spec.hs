@@ -3,7 +3,7 @@
 import Test.Hspec
 
 import ParserSpec
-import ExprSpec
+import UnlambdaSpec
 -- import FocusSpec
 import PPrintSpec
 
@@ -16,10 +16,10 @@ main = hspec $ do
     specParserContext
     specParserLineComment
 
-    specExprExists
+    specUnlambdaExists
     -- specExprIsFreeIn
     -- specExprResolve
-    specExprUnlambda
+    specUnlambdaUnlambda
     -- specExprSubst
     -- specExprCompile
     -- specExprApply

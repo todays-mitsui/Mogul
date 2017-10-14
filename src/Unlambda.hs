@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Expr where
+module Unlambda where
 
 import Control.Monad (guard)
 
