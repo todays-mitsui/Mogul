@@ -8,7 +8,7 @@ import Data.Map.Lazy (Map, (!))
 import qualified Data.Map.Lazy as Map
 
 import Data
-import Expr hiding (apply)
+import Unlambda hiding (apply)
 import Focus
 
 

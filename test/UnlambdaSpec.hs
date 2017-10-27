@@ -1,14 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module ExprSpec (
-  specExprIsFreeIn,
-  specExprResolve,
-  specExprUnlambda,
-  specExprSubst,
-  specExprCompile,
-  specExprApply,
-  specExprRename,
-  specExprRewrite
+module UnlambdaSpec (
+  specUnlambdaIsFreeIn,
+  specUnlambdaResolve,
+  specUnlambdaUnlambda,
+  specUnlambdaSubst,
+  specUnlambdaCompile,
+  specUnlambdaApply,
+  specUnlambdaRename,
+  specUnlambdaRewrite
 ) where
 
 import System.IO
@@ -20,24 +20,24 @@ import Control.Monad.Trans   (liftIO)
 import Text.Parsec           (parse)
 import Text.Parsec.Error     (ParseError, errorMessages)
 import qualified Data.Text as T
-import qualified Data.Text.IO as TIO
+import qualified Data.Text.IO as T
 import Data.Set (fromList)
 
 import Data
 import Parser hiding (context)
 import qualified Parser as P
-import Expr
+import Unlambda
 
 
 readSampleContext :: IO (Either ParseError Context)
 readSampleContext = parse P.context "" <$> do
   h <- openFile "test/sample.context" ReadMode
   hSetEncoding h utf8
-  TIO.hGetContents h
+  T.hGetContents h
 
 --------------------------------------------------------------------------------
 
-specExprIsFreeIn = describe "x `Expr.isFreeIn` expr" $ do
+specUnlambdaIsFreeIn = describe "x `Unlambda.isFreeIn` expr" $ do
   context "when x is free in expr" $ do
     it "retrun True" $
       x `isFreeIn` (y :^ Var y :$ Var x)
@@ -47,7 +47,7 @@ specExprIsFreeIn = describe "x `Expr.isFreeIn` expr" $ do
       not (x `isFreeIn` (x :^ Var x :$ Var y))
 
 
-specExprResolve = describe "Expr.resolve" $ do
+specUnlambdaResolve = describe "Unlambda.resolve" $ do
   it "resolve ^x.x to i" $ do
     resolve x (Var x) `shouldBe` i
 
@@ -62,7 +62,7 @@ specExprResolve = describe "Expr.resolve" $ do
       `shouldBe` (s :$ resolve x (f :$ Var x) :$ resolve x (g :$ Var x))
 
 
-specExprUnlambda = describe "Expr.unlambda" $ do
+specUnlambdaUnlambda = describe "Unlambda.unlambda" $ do
   it "resolve ^x.x to i" $ do
     unlambda (x :^ Var x) `shouldBe` i
 
@@ -82,7 +82,7 @@ specExprUnlambda = describe "Expr.unlambda" $ do
       `shouldBe` (s :$ (s :$ (s :$ (k :$ s) :$ k) :$ (k :$ (s :$ i :$ i))) :$ (s :$ (s :$ (k :$ s) :$ k) :$ (k :$ (s :$ i :$ i))))
 
 
-specExprSubst = describe "Expr.subst" $ do
+specUnlambdaSubst = describe "Unlambda.subst" $ do
   it "substitute ISZERO combination of subfunctions" $ do
     Right context <- liftIO readSampleContext
     subst context (Var (LargeIdent "ISZERO" Nothing))
@@ -99,7 +99,7 @@ specExprSubst = describe "Expr.subst" $ do
       `shouldBe` (LargeIdent "NAMED"  Nothing :^ Var (LargeIdent "NAMED" Nothing) :$ Var (LargeIdent "NAMED" Nothing))
 
 
-specExprCompile = describe "Expr.compile" $ do
+specUnlambdaCompile = describe "Unlambda.compile" $ do
   it "compile ISZERO to SKI Combinator" $ do
     Right context <- liftIO readSampleContext
     compile context (Var (LargeIdent "ISZERO" Nothing))
@@ -115,7 +115,7 @@ specExprCompile = describe "Expr.compile" $ do
     compile context (Var (LargeIdent "NAMED" Nothing))
       `shouldBe` (s :$ i :$ i)
 
-specExprApply = describe "Expr.apply" $ do
+specUnlambdaApply = describe "Unlambda.apply" $ do
   -- it "can call Func with given Args" $ do
   --   Right context <- liftIO readSampleContext
   --   apply context (LargeIdent "FLIP" Nothing) [Var (LargeIdent "F" Nothing), Var (LargeIdent "X" Nothing), Var (LargeIdent "Y" Nothing)]
@@ -126,7 +126,7 @@ specExprApply = describe "Expr.apply" $ do
     apply context (LargeIdent "UNDEFINED_FUNC" Nothing) [Var x, Var y, Var z]
       `shouldBe` (Var (LargeIdent "UNDEFINED_FUNC" Nothing) :$ Var x :$ Var y :$ Var z)
 
-specExprRename = describe "Expr.rename" $ do
+specUnlambdaRename = describe "Unlambda.rename" $ do
   it "rename reserved Variable" $
     let reserved = fromList [x, y, z]
     in  rename reserved x /= x
@@ -135,7 +135,7 @@ specExprRename = describe "Expr.rename" $ do
     let reserved = fromList [x, y, z]
     in  rename reserved n == n
 
-specExprRewrite = describe "Expr.rewrite" $ do
+specUnlambdaRewrite = describe "Unlambda.rewrite" $ do
   it "..." $ do
     let y' = LargeIdent "Y" $ Just 0
     rewrite x (Var x :$ Var y) (y :^ Var y)

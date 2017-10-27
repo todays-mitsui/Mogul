@@ -17,7 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Lib
                      , Data
-                     , Expr
+                     , Unlambda
                      , Parser
                      , PPrint
                      , Focus
@@ -46,7 +46,7 @@ test-suite mogul-test
   hs-source-dirs:      test
   main-is:             Spec.hs
   other-modules:       ParserSpec
-                     , ExprSpec
+                     , UnlambdaSpec
                      , FocusSpec
                      , PPrintSpec
   build-depends:       base

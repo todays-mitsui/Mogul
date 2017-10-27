@@ -13,7 +13,6 @@ import Data.Text              (Text, pack, unpack)
 import Data.Map.Lazy          (foldrWithKey)
 
 import Data
-import Expr
 
 
 class PPrintable a where
