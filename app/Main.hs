@@ -13,7 +13,7 @@ import Data
 -- import Expr
 -- import Eval
 
-import Parser      (context, expr, def)
+import Parser      (parseExpr, parseContext)
 import PPrint      (pp)
 import Focus       (goRoot)
 
@@ -40,13 +40,13 @@ main = do
   -- putStrLn . pp $ x
   -- mapM_ (putStrLn . pp) (reverse $ evals c x)
 
-skk = parse expr "" "```skka"
+skk = parseExpr "```skka"
 
 loadContext :: String -> IO Context
 loadContext filepath = do
   h <- openFile filepath ReadMode
   hSetEncoding h utf8
-  eitherContext <- parse context "" <$> T.hGetContents h
+  eitherContext <- parseContext <$> T.hGetContents h
   case eitherContext of
        Left  parseError -> do putStrLn . show $ parseError
                               return emptyContext

@@ -45,9 +45,9 @@ isLargeIdent = not . isUniIdent
 
 -- | λ式
 data Expr = Var !Ident      -- 変数
-          | Con !Ident      -- コンビネータ−
           | !Ident :^ Expr  -- 関数抽象
           | Expr   :$ Expr  -- 関数適用
+          | Com !Ident      -- コンビネータ−
   deriving (Eq, Show, Read)
 
 infixl 9 :$

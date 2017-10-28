@@ -7,6 +7,9 @@ module Parser
 import Control.Monad (void)
 import Control.Applicative hiding ((<|>), many)
 
+import qualified Data.Set      as Set
+import Data.Set (Set, insert, member, fromList)
+
 import qualified Data.Map.Lazy as Map
 import qualified Data.Text     as T
 import Data.Text (Text, pack, singleton)
@@ -34,10 +37,10 @@ subst = subst' Set.empty
 subst' :: Set Ident -> Expr -> Expr
 subst' vs (Var x)
   | x `Set.member` vs = Var x
-  | otherwise         = Con x
-subst' vs (Con x)
+  | otherwise         = Com x
+subst' vs (Com x)
   | x `member` vs = Var x
-  | otherwise         = Con x
+  | otherwise         = Com x
 subst' vs (el :$ er)  = subst' vs el :$ subst' vs er
 subst' vs (x  :^ e)   = let vs' = x `insert` vs
                             e'  = subst' vs' e
