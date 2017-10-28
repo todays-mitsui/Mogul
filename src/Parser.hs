@@ -1,10 +1,7 @@
 module Parser
     (
-      ident
-    , expr
-    , def
-    , context
-    , lineComment
+      parseExpr
+    , parseContext
     ) where
 
 import Control.Monad (void)
@@ -20,6 +17,37 @@ import Text.Parsec.Text
 import Data (Ident(..), Expr(..), Func(..), Context)
 import qualified Data as D
 
+
+parseExpr :: Text -> Either ParseError Expr
+parseExpr src = subst <$> parse expr "" src
+
+parseContext :: Text -> Either ParseError Context
+parseContext src = parse context "" src <$$> \context ->
+                       substF <$> context
+  where
+    xs <$$> f = f <$> xs
+
+
+subst :: Expr -> Expr
+subst = subst' Set.empty
+
+subst' :: Set Ident -> Expr -> Expr
+subst' vs (Var x)
+  | x `Set.member` vs = Var x
+  | otherwise         = Con x
+subst' vs (Con x)
+  | x `member` vs = Var x
+  | otherwise         = Con x
+subst' vs (el :$ er)  = subst' vs el :$ subst' vs er
+subst' vs (x  :^ e)   = let vs' = x `insert` vs
+                            e'  = subst' vs' e
+                        in  x :^ e'
+
+substF :: Func -> Func
+substF (Func args bareExpr) = let e = subst' (fromList args) bareExpr
+                              in  Func args e
+
+--------------------------------------------------------------------------------
 
 -- | Mogul syntax
 --
