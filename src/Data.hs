@@ -9,7 +9,7 @@ module Data
     , Expr(..)
     , var
 
-    , Func(Func, bareExpr)
+    , Func(..)
     , arity, body
 
     , Context
@@ -60,12 +60,12 @@ var = Var . Ident
 
 -- | 無名関数
 data Func = Func
-    { args     :: [Ident]
+    { params   :: [Ident]
     , bareExpr :: Expr
     } deriving (Eq, Show, Read)
 
 arity :: Func -> Int
-arity = length . args
+arity = length . params
 
 body :: Func -> Expr
 body (Func vs e) = foldr (:^) e vs

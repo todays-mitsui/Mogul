@@ -11,11 +11,11 @@ import Text.Parsec (parse)
 
 import Data
 -- import Expr
--- import Eval
+import Eval
 
 import Parser      (parseExpr, parseContext)
 import PPrint      (pp)
-import Focus       (goRoot)
+-- import Focus       (goRoot)
 
 
 main :: IO ()
@@ -25,6 +25,9 @@ main :: IO ()
 main = do
   c <- loadContext "default.context"
   putStrLn . pp $ c
+  putStrLn $ show skk
+  -- mapM_ (putStrLn . show) . eval c [] $ skk
+  mapM_ (putStrLn . pp . uncrumb) . eval c [] $ skk
   -- forever $ do
   --   putStrLn "Input Lambda term:"
   --   putStr "> "
@@ -40,7 +43,7 @@ main = do
   -- putStrLn . pp $ x
   -- mapM_ (putStrLn . pp) (reverse $ evals c x)
 
-skk = parseExpr "```skka"
+Right skk = parseExpr "``ik``^x.^y.`yxab"
 
 loadContext :: String -> IO Context
 loadContext filepath = do
