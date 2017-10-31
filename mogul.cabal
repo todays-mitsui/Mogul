@@ -49,6 +49,7 @@ test-suite mogul-test
                      , UnlambdaSpec
                      , FocusSpec
                      , PPrintSpec
+                     , EvalSpec
   build-depends:       base
                      , hspec
                      , mogul

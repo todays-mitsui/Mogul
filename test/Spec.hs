@@ -6,6 +6,7 @@ import ParserSpec
 -- import ExprSpec
 import FocusSpec
 import PPrintSpec
+import EvalSpec
 
 
 main :: IO ()
@@ -27,3 +28,5 @@ main = hspec $ do
   specFocusGoRoot
 
   specPPrintPp
+
+  specEvalEval

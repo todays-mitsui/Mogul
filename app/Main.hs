@@ -27,7 +27,7 @@ main = do
   putStrLn . pp $ c
   putStrLn $ show skk
   -- mapM_ (putStrLn . show) . eval c [] $ skk
-  mapM_ (putStrLn . pp . uncrumb) . eval c [] $ skk
+  -- mapM_ (putStrLn . pp . uncrumb) . eval c [] $ skk
   -- forever $ do
   --   putStrLn "Input Lambda term:"
   --   putStr "> "

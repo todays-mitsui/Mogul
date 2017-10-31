@@ -18,22 +18,24 @@ data BreadCrumb = BreadCrumb { leftExpr :: Maybe Expr
                              , args     :: [Expr] }
   deriving (Eq, Show)
 
+eval context e = map uncrumb $ reduce context [] e
+
 uncrumb :: (Expr, [BreadCrumb]) -> Expr
 uncrumb (e, []) = e
 uncrumb (e, [BreadCrumb Nothing es])       = foldr (flip (:$)) e es
 uncrumb (e, BreadCrumb (Just el) es : bcs) = uncrumb (el :$ foldr (flip (:$)) e es, bcs)
 
-eval :: Context -> [BreadCrumb] -> Expr -> [(Expr, [BreadCrumb])]
-eval _ (bc@(BreadCrumb _ (e:es)) : bcs) (x :^ e') = [(rewrite x e e', bc{args=es} : bcs)]
-eval context [] (el :$ er) = concat [
-    eval context [BreadCrumb Nothing [er]] el
-  , eval context [BreadCrumb (Just el) []] er
+reduce :: Context -> [BreadCrumb] -> Expr -> [(Expr, [BreadCrumb])]
+reduce _ (bc@(BreadCrumb _ (e:es)) : bcs) (x :^ e') = [(rewrite x e e', bc{args=es} : bcs)]
+reduce context [] (el :$ er) = concat [
+    reduce context [BreadCrumb Nothing [er]] el
+  , reduce context [BreadCrumb (Just el) []] er
   ]
-eval context (bc@(BreadCrumb _ es) : bcs) (el :$ er) = concat [
-    eval context (bc{args=er:es} : bcs) el
-  , eval context (BreadCrumb (Just el) []:bc:bcs) er
+reduce context (bc@(BreadCrumb _ es) : bcs) (el :$ er) = concat [
+    reduce context (bc{args=er:es} : bcs) el
+  , reduce context (BreadCrumb (Just el) []:bc:bcs) er
   ]
-eval context (bc@(BreadCrumb _ es):bcs) (Com x)
+reduce context (bc@(BreadCrumb _ es):bcs) (Com x)
   | x `notMember` context      = []
   | length es < arity f        = []
   | otherwise                  = [(rewrites (zip vs es) body, bc{args=drop (arity f) es} : bcs)]
@@ -41,7 +43,7 @@ eval context (bc@(BreadCrumb _ es):bcs) (Com x)
     Just f = x `Map.lookup` context
     vs   = params f
     body = bareExpr f
-eval _ _ _ = []
+reduce _ _ _ = []
 
 foo = (Ident "x" :^ Var (Ident "x")) :$ Com (Ident"y")
 c = Map.empty

@@ -8,6 +8,7 @@ module Data
 
     , Expr(..)
     , var
+    , com
 
     , Func(..)
     , arity, body
@@ -55,6 +56,9 @@ infixr 7 :^
 
 var :: Text -> Expr
 var = Var . Ident
+
+com :: Text -> Expr
+com = Com . Ident
 
 --------------------------------------------------------------------------------
 
