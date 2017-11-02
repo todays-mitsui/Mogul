@@ -14,31 +14,38 @@ import Control.Monad.State.Lazy
 import Data
 
 
-data BreadCrumb = BreadCrumb { leftExpr :: Maybe Expr
-                             , args     :: [Expr] }
+data BreadCrumb = LeftExpr Expr
+                | Args [Expr]
   deriving (Eq, Show)
+
+normalize :: [BreadCrumb] -> [BreadCrumb]
+normalize (Args [] : bcs)             = normalize bcs
+normalize (Args es1 : Args es2 : bcs) = normalize (Args (es1 ++ es2) : bcs)
+normalize bcs                         = bcs
+
+--------------------------------------------------------------------------------
 
 eval context e = map uncrumb $ reduce context [] e
 
 uncrumb :: (Expr, [BreadCrumb]) -> Expr
-uncrumb (e, []) = e
-uncrumb (e, [BreadCrumb Nothing es])       = foldr (flip (:$)) e es
-uncrumb (e, BreadCrumb (Just el) es : bcs) = uncrumb (el :$ foldr (flip (:$)) e es, bcs)
+uncrumb (e, [])                = e
+uncrumb (e, LeftExpr el : bcs) = uncrumb (el :$ e, bcs)
+uncrumb (e, Args es     : bcs) = uncrumb (foldr (flip (:$)) e es, bcs)
 
 reduce :: Context -> [BreadCrumb] -> Expr -> [(Expr, [BreadCrumb])]
-reduce _ (bc@(BreadCrumb _ (e:es)) : bcs) (x :^ e') = [(rewrite x e e', bc{args=es} : bcs)]
+reduce _ (Args (e:es) : bcs) (x :^ e') = [(rewrite x e e', Args es : bcs)]
 reduce context [] (el :$ er) = concat [
-    reduce context [BreadCrumb Nothing [er]] el
-  , reduce context [BreadCrumb (Just el) []] er
+    reduce context [Args [er]]   el
+  , reduce context [LeftExpr el] er
   ]
-reduce context (bc@(BreadCrumb _ es) : bcs) (el :$ er) = concat [
-    reduce context (bc{args=er:es} : bcs) el
-  , reduce context (BreadCrumb (Just el) []:bc:bcs) er
+reduce context bcs (el :$ er) = concat [
+    reduce context (normalize (Args [er] : bcs)) el
+  , reduce context (LeftExpr el : bcs)           er
   ]
-reduce context (bc@(BreadCrumb _ es):bcs) (Com x)
+reduce context (Args es : bcs) (Com x)
   | x `notMember` context      = []
   | length es < arity f        = []
-  | otherwise                  = [(rewrites (zip vs es) body, bc{args=drop (arity f) es} : bcs)]
+  | otherwise                  = [(rewrites (zip vs es) body, normalize (Args (drop (arity f) es) : bcs))]
   where
     Just f = x `Map.lookup` context
     vs   = params f
