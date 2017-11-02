@@ -19,8 +19,8 @@ data BreadCrumb = LeftExpr Expr
   deriving (Eq, Show)
 
 normalize :: [BreadCrumb] -> [BreadCrumb]
-normalize (Args [] : bcs)             = normalize bcs
-normalize (Args es1 : Args es2 : bcs) = normalize (Args (es1 ++ es2) : bcs)
+normalize (Args [] : bcs)             = bcs
+normalize (Args es1 : Args es2 : bcs) = (Args (es1 ++ es2) : bcs)
 normalize bcs                         = bcs
 
 --------------------------------------------------------------------------------
