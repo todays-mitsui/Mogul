@@ -4,40 +4,33 @@ import Test.Hspec
 
 import DataSpec
 import ParserSpec
-import ExprSpec
-import UnlambdaSpec
+-- import ExprSpec
+-- import UnlambdaSpec
 -- import FocusSpec
 import PPrintSpec
+import EvalSpec
 
 
 main :: IO ()
 main = hspec $ do
-    specDataEq
-    specDataFunc
+  specDataFunc
 
-    specParserIdent
-    specParserExpr
-    specParserDef
-    specParserContext
-    specParserLineComment
+  specParserExpr
+  specParserContext
 
-    specExprAddIndex
-    specExprAddIndexF
-    specExprParseExpr
-    specExprParseContext
+  -- specExprIsFreeIn
+  -- specExprResolve
+  -- specExprUnlambda
+  -- specExprSubst
+  -- specExprCompile
+  -- specExprApply
+  -- specExprRename
+  -- specExprRewrite
 
-    specUnlambdaExists
-    -- specExprIsFreeIn
-    -- specExprResolve
-    specUnlambdaUnlambda
-    -- specExprSubst
-    -- specExprCompile
-    -- specExprApply
-    -- specExprRename
-    -- specExprRewrite
+  -- specFocusGoLeftOrRightOrUpOrIntoLambda
+  -- specFocusGoUps
+  -- specFocusGoRoot
 
-    -- specFocusGoLeftOrRightOrUpOrIntoLambda
-    -- specFocusGoUps
-    -- specFocusGoRoot
+  specPPrintPp
 
-    specPPrintPp
+  specEvalEval

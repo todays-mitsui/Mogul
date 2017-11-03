@@ -9,8 +9,9 @@ module Data
     , Index
     , Expr(..)
     , var
+    , com
 
-    , Func(Func, bareExpr)
+    , Func(..)
     , arity, body
 
     , Context
@@ -48,34 +49,31 @@ isLargeIdent = not . isUniIdent
 type Index = Int
 
 -- | λ式
-data Expr = Var (Maybe Index) !Ident  -- 変数
-          | !Ident :^ Expr            -- 関数抽象
-          | Expr   :$ Expr            -- 関数適用
-  deriving (Show, Read)
+data Expr = Var !Ident      -- 変数
+          | !Ident :^ Expr  -- 関数抽象
+          | Expr   :$ Expr  -- 関数適用
+          | Com !Ident      -- コンビネータ−
+  deriving (Eq, Show, Read)
 
 infixl 9 :$
 infixr 7 :^
 
-instance Eq Expr where
-    Var (Just x) _ == Var (Just y) _ = x == y
-    Var Nothing  x == Var Nothing  y = x == y
-    _  :^ x        == _  :^ y        = x == y
-    xl :$ xr       == yl :$ yr       = xl == yl && xr == yr
-    _              == _              = False
-
 var :: Text -> Expr
-var = Var Nothing . Ident
+var = Var . Ident
+
+com :: Text -> Expr
+com = Com . Ident
 
 --------------------------------------------------------------------------------
 
 -- | 無名関数
 data Func = Func
-    { args     :: [Ident]
+    { params   :: [Ident]
     , bareExpr :: Expr
     } deriving (Eq, Show, Read)
 
 arity :: Func -> Int
-arity = length . args
+arity = length . params
 
 body :: Func -> Expr
 body (Func vs e) = foldr (:^) e vs
