@@ -11,6 +11,7 @@ import Data.Monoid            ((<>))
 import qualified Data.Text as T
 import Data.Text              (Text, pack, unpack)
 import Data.Map.Lazy          (foldrWithKey)
+import Data.Tree
 
 import Data
 
@@ -78,3 +79,24 @@ symbol :: Ident -> Token
 symbol v@(Ident x)
     | isUniIdent v = Symbol x
     | otherwise    = LargeSymbol x
+
+--------------------------------------------------------------------------------
+
+data Unit = USymbol Text
+          | ULambda Text Tree
+  deriving (Eq, Show)
+
+data Tree a = Tip a
+            | Bin Tree Tree
+  deriving (Eq, Show)
+
+tree :: Expr -> Tree Unit
+tree (Var (Ident x)) = Tip $ USymbol x
+tree (Com (Ident x)) = Tip $ USymbol x
+tree (x :^ e)        = Tip $ ULambda x (tree e)
+tree (el :$ er)      = Bin (tree el) (tree er)
+
+-- tokens :: Tree Unit -> [Token]
+-- tokens (Tip (USymbol x)   = [t]
+-- tokens (Tip (ULambda x t) = [Lambda, x, Dot] <> tokens t
+-- tokens (Bin tl tr)        = [Backquote] <> tokens tl <> tokens tr

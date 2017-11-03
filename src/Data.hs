@@ -45,9 +45,6 @@ isLargeIdent = not . isUniIdent
 
 --------------------------------------------------------------------------------
 
--- | ド・ブラン・インデックス
-type Index = Int
-
 -- | λ式
 data Expr = Var !Ident      -- 変数
           | !Ident :^ Expr  -- 関数抽象
@@ -88,10 +85,33 @@ emptyContext = Map.empty
 --------------------------------------------------------------------------------
 
 i :: Expr
-i = var "i"
+i = com "i"
 
 k :: Expr
-k = var "k"
+k = com "k"
 
 s :: Expr
-s = var "s"
+s = com "s"
+
+--------------------------------------------------------------------------------
+
+data ExtraExpr = ExVar !Ident (Maybe Int)
+               | ExLambda !Ident Expr
+               | ExApply Expr Expr Bool
+               | ExCom !Ident (Maybe Func)
+deriving (Eq, Show)
+
+addMetaInfo :: Context -> Counter -> Expr -> ExtraExpr
+addMetaInfo context counter (Var x)
+  | x `Set.member` fvs = ExVar x (Just 0)
+  | otherwise          = ExVar x Nothing
+  where
+    fvs = freeVars counter
+addMetaInfo context counter (Com x)    = ExCom x (x `Map.lookup` context)
+addMetaInfo context counter (el :$ er) = ExApply el er False
+
+data Counter = Counter {
+    argCount    :: Int
+  , freeVars    :: Set Ident
+  , boundedVars :: Set Ident
+  } deriving (Eq, Show)
