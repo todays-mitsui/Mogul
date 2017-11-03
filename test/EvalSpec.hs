@@ -22,6 +22,8 @@ Right c = parseContext . T.unlines $ [
   , "`Yf = `^x.`f`xx^x.`f`xx"
   ]
 
+-- Right c = parseContext . T.unlines $ ["`ix = x", "``kxy = x", "```sxyz = ``xz`yz", "`Yf = `^x.`f`xx^x.`f`xx"]
+
 specEvalEval = describe "Eval.eval" $ do
     context "Expr has β-redex" $
       it "return list of Expr reduced only one β-redex" $ do
@@ -31,13 +33,21 @@ specEvalEval = describe "Eval.eval" $ do
         let Right e2 = parseExpr "```s`ix`iy`iz"
         eval c e2 `shouldBe` [
             com "i" :$ com "x" :$ (com "i" :$ com "z") :$ (com "i" :$ com "y" :$ (com "i" :$ com "z"))
-          , com "s" :$ com "x" :$ (com "i" :$ com "z") :$ (com "i" :$ com "y")
+          , com "s" :$ com "x" :$ (com "i" :$ com "y") :$ (com "i" :$ com "z")
           , com "s" :$ (com "i" :$ com "x") :$ com "y" :$ (com "i" :$ com "z")
           , com "s" :$ (com "i" :$ com "x") :$ (com "i" :$ com "y") :$ com "z"
           ]
 
-        let Right e3 = parseExpr "`^x.^y.``xyy``kyx"
+        let Right e3 = parseExpr "```ix`iz``iy`iz"
         eval c e3 `shouldBe` [
+            com "x" :$ (com "i" :$ com "z") :$ (com "i" :$ com "y" :$ (com "i" :$ com "z"))
+          , com "i" :$ com "x" :$ com "z" :$ (com "i" :$ com "y" :$ (com "i" :$ com "z"))
+          , com "i" :$ com "x" :$ (com "i" :$ com "z") :$ (com "y" :$ (com "i" :$ com "z"))
+          , com "i" :$ com "x" :$ (com "i" :$ com "z") :$ (com "i" :$ com "y" :$ com "z")
+          ]
+
+        let Right e4 = parseExpr "`^x.^y.``xyy``kyx"
+        eval c e4 `shouldBe` [
             Ident "y" :^ (com "k" :$ com "y" :$ com "x") :$ var "y" :$ var "y"
           , (Ident "x" :^ Ident "y" :^ var "x" :$ var "y" :$ var "y") :$ com "y"
           ]

@@ -25,12 +25,18 @@ normalize bcs                         = bcs
 
 --------------------------------------------------------------------------------
 
+evals :: Context -> Expr -> [Expr]
+evals context e = case eval context e of
+                       []       -> []
+                       (e' : _) -> e' : evals context e'
+
+eval :: Context -> Expr -> [Expr]
 eval context e = map uncrumb $ reduce context [] e
 
 uncrumb :: (Expr, [BreadCrumb]) -> Expr
 uncrumb (e, [])                = e
 uncrumb (e, LeftExpr el : bcs) = uncrumb (el :$ e, bcs)
-uncrumb (e, Args es     : bcs) = uncrumb (foldr (flip (:$)) e es, bcs)
+uncrumb (e, Args es     : bcs) = uncrumb (foldl (:$) e es, bcs)
 
 reduce :: Context -> [BreadCrumb] -> Expr -> [(Expr, [BreadCrumb])]
 reduce _ (Args (e:es) : bcs) (x :^ e') = [(rewrite x e e', Args es : bcs)]
