@@ -22,8 +22,6 @@ Right c = parseContext . T.unlines $ [
   , "`Yf = `^x.`f`xx^x.`f`xx"
   ]
 
--- Right c = parseContext . T.unlines $ ["`ix = x", "``kxy = x", "```sxyz = ``xz`yz", "`Yf = `^x.`f`xx^x.`f`xx"]
-
 specEvalEval = describe "Eval.eval" $ do
     context "Expr has β-redex" $
       it "return list of Expr reduced only one β-redex" $ do
