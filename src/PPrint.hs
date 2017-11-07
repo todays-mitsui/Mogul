@@ -48,13 +48,13 @@ instance PPrintable Context where
 
 --------------------------------------------------------------------------------
 
-data Token = Backquote         -- "`"
-           | Lambda            -- "^"
-           | Dot               -- "."
-           | Equal             -- "="
-           | Symbol Text       -- 英小文字1文字からなるシンボル
-           | LargeSymbol Text  -- 英数字2文字以上からなるシンボル
-           | EOL               -- 行端
+data Token = Backquote         -- ^ "`"
+           | Lambda            -- ^ "^"
+           | Dot               -- ^ "."
+           | Equal             -- ^ "="
+           | Symbol Text       -- ^ 英小文字1文字からなるシンボル
+           | LargeSymbol Text  -- ^ 英数字2文字以上からなるシンボル
+           | EOL               -- ^ 行端
   deriving (Eq)
 
 instance Show Token where

@@ -18,7 +18,7 @@ import Data
 
 
 -- | λ式を段階的に簡約して、すべてのステップの式を返す
--- | 評価戦略は最左最外簡約
+-- 評価戦略は最左最外簡約
 evals :: Context -> Expr -> [Expr]
 evals context e = case eval context e of
                        []       -> []
@@ -32,13 +32,13 @@ eval context e = map uncrumb $ reduce context [] e
 --------------------------------------------------------------------------------
 
 -- | 構文木を辿っていくとき、着目していない側の部分木を保持しておく構造体
--- | 着目している部分木と着目していない部分木で構文木全体を常に表現できるように保つ
--- |
--- | (el :$ er, breadcrumbs) === (er, LeftExpr el : breadcrumbs)
--- | (el :$ er, breadcrumbs) === (el, Args [er] : breadcrumbs)
--- | 逆も然り、
--- | (e, LeftExpr el            : breadcrumbs) === (el :$ e, breadcrumbs)
--- | (e, Args [e1, e2, ..., en] : breadcrumbs) === (e :$ e1 :$ e2 :$ ... :$ en, breadcrumbs)
+-- 着目している部分木と着目していない部分木で構文木全体を常に表現できるように保つ
+--
+-- (el :$ er, breadcrumbs) === (er, LeftExpr el : breadcrumbs)
+-- (el :$ er, breadcrumbs) === (el, Args [er] : breadcrumbs)
+-- 逆も然り、
+-- (e, LeftExpr el            : breadcrumbs) === (el :$ e, breadcrumbs)
+-- (e, Args [e1, e2, ..., en] : breadcrumbs) === (e :$ e1 :$ e2 :$ ... :$ en, breadcrumbs)
 data BreadCrumb = LeftExpr Expr  -- ^ el :$ er の er に着目しているとき el を保持する
                 | Args [Expr]    -- ^ el :$ er の el に着目しているとき er を保持する
   deriving (Eq, Show)
@@ -57,7 +57,7 @@ uncrumb (e, Args es     : bcs) = uncrumb (foldl (:$) e es, bcs)
 --------------------------------------------------------------------------------
 
 -- | 構文木を辿り、簡約可能な個所を探して一か所だけ簡約した結果のすべてを返す
--- | 簡約可能な個所が n か所あれば、結果は長さ n のリストになる
+-- 簡約可能な個所が n か所あれば、結果は長さ n のリストになる
 reduce :: Context -> [BreadCrumb] -> Expr -> [(Expr, [BreadCrumb])]
 reduce _ (Args (e:es) : bcs) (x :^ e') = [(rewrite x e e', Args es : bcs)]
 reduce context [] (el :$ er) = concat [

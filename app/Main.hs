@@ -2,48 +2,44 @@
 
 module Main where
 
-import System.IO                 (IOMode (..), openFile, hSetEncoding, utf8)
+import System.Directory           (getCurrentDirectory)
+import System.IO                  (IOMode (..), openFile, hSetEncoding, hFlush, stdout, utf8)
 import qualified Data.Text     as T
 import qualified Data.Text.IO  as T
-import Data.Functor ((<$>))
-import Control.Monad             (forever)
-import Text.Parsec (parse)
+import Data.Functor               ((<$>))
+import Data.List                  (splitAt)
+import Control.Monad              (forever)
+import Text.Parsec                (parse)
 
 import Data
--- import Expr
 import Eval
 
 import Parser      (parseExpr, parseContext)
 import PPrint      (pp)
--- import Focus       (goRoot)
 
 
 main :: IO ()
--- main = case parse def "" "```sxyz = ``xz`yz" of
---             Left  parseError -> putStrLn . show $ parseError
---             Right parsedExpr -> putStrLn . pp $ parsedExpr
 main = do
-  c <- loadContext "default.context"
-  putStrLn . pp $ c
-  putStrLn $ show skk
-  -- mapM_ (putStrLn . show) . eval c [] $ skk
-  -- mapM_ (putStrLn . pp . uncrumb) . eval c [] $ skk
-  -- forever $ do
-  --   putStrLn "Input Lambda term:"
-  --   putStr "> "
-  --   input <- TIO.getLine
-  --   case parse expr "" input of
-  --     Left  parseError -> putStrLn . show $ parseError
-  --     Right e          -> do putStrLn . pp $ e
-  --                            mapM_ (putStrLn . pp) (reverse $ evals c e)
-  --   putStrLn ""
+  cd      <- getCurrentDirectory
+  context <- loadContext $ cd ++ "/default.context"
+  putStrLn "Mogul v0.1.0"
+  putStrLn ""
+  putStrLn . pp $ context
+  forever $ do
+    putStr "> "
+    hFlush stdout
+    input <- T.getLine
+    case parseExpr input of
+         Left  parseError -> putStrLn . show $ parseError
+         Right e          ->
+           do putStrLn . pp $ e
+              let (es, cont) = splitAt 500 $ evals context e
+              mapM_ (putStrLn . ("⇒ " ++) . pp) es
+              if not (null cont)
+                 then putStrLn $ (show . length $ es) ++ " steps, and more..."
+                 else putStrLn $ (show . length $ es) ++ " steps, done."
+    putStrLn ""
 
-  -- putStrLn ""
-  -- let Right x = skk
-  -- putStrLn . pp $ x
-  -- mapM_ (putStrLn . pp) (reverse $ evals c x)
-
-Right skk = parseExpr "``ik``^x.^y.`yxab"
 
 loadContext :: String -> IO Context
 loadContext filepath = do
