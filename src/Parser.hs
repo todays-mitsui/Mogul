@@ -1,8 +1,11 @@
 module Parser
-    (
-      parseExpr
+    ( parseExpr
     , parseContext
-    ) where
+    , subst, substF
+    , expr
+    , ident
+    , def ) where
+
 
 import Control.Monad (void)
 import Control.Applicative hiding ((<|>), many)
