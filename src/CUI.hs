@@ -95,8 +95,8 @@ runEvalHead n e = do
     liftIO $ putStrLn . pp $ e
     liftIO $ mapM_ (putStrLn . ("⇒ " ++) . pp) es
     if not (null cont)
-       then do liftIO $ putStrLn "⇒ ..."
-               liftIO $ putStrLn $ (show . length $ es) ++ " steps, and more..."
+       then liftIO $ do putStrLn "⇒ ..."
+                        putStrLn $ (show . length $ es) ++ " steps, and more..."
        else liftIO $ putStrLn $ (show . length $ es) ++ " steps, done."
     liftIO $ putStrLn ""
 
