@@ -28,6 +28,7 @@ library
                      , containers
                      , parsec3
                      , mtl
+                     , directory
   default-language:    Haskell2010
 
 executable mogul

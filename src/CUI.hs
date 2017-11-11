@@ -30,6 +30,8 @@ import Eval (evals)
 
 data Command = CmdEvals    Expr
              | CmdEvalLast Expr
+             | CmdEvalHead !Int Expr
+             | CmdEvalTail !Int Expr
              | CmdInfo     Ident
              | CmdStore    Ident Func
              | CmdDelete   Ident
@@ -68,36 +70,49 @@ loadContext filepath = do
 --------------------------------------------------------------------------------
 
 runCommand :: Command -> Mogul ()
-runCommand (CmdEvals e)    = runEval e
-runCommand (CmdEvalLast e) = runEvalLast e
-runCommand (CmdInfo x)     = runInfo x
-runCommand (CmdStore x f)  = runStore x f
-runCommand (CmdDelete x)   = runDelete x
-runCommand CmdShowContext  = runShowContext
-runCommand CmdNull         = runNull
-runCommand CmdQuit         = runQuit
+runCommand (CmdEvals e)      = runEval e
+runCommand (CmdEvalLast e)   = runEvalLast e
+runCommand (CmdEvalHead n e) = runEvalHead n e
+runCommand (CmdEvalTail n e) = runEvalTail n e
+runCommand (CmdInfo x)       = runInfo x
+runCommand (CmdStore x f)    = runStore x f
+runCommand (CmdDelete x)     = runDelete x
+runCommand CmdShowContext    = runShowContext
+runCommand CmdNull           = runNull
+runCommand CmdQuit           = runQuit
 
 
 runEval :: Expr -> Mogul ()
-runEval e = do
+runEval = runEvalHead 1000
+
+runEvalLast :: Expr -> Mogul ()
+runEvalLast = runEvalTail 1
+
+runEvalHead :: Int -> Expr -> Mogul ()
+runEvalHead n e = do
     context <- get
-    let (es, cont) = splitAt 1000 $ evals context e
+    let (es, cont) = splitAt n $ evals context e
     liftIO $ putStrLn . pp $ e
     liftIO $ mapM_ (putStrLn . ("⇒ " ++) . pp) es
     if not (null cont)
-       then liftIO $ putStrLn $ (show . length $ es) ++ " steps, and more..."
+       then do liftIO $ putStrLn "⇒ ..."
+               liftIO $ putStrLn $ (show . length $ es) ++ " steps, and more..."
        else liftIO $ putStrLn $ (show . length $ es) ++ " steps, done."
     liftIO $ putStrLn ""
 
-runEvalLast :: Expr -> Mogul ()
-runEvalLast e = do
+runEvalTail :: Int -> Expr -> Mogul ()
+runEvalTail n e = do
     context <- get
     let (es, cont) = splitAt 10000 $ evals context e
+    let len = length es
     liftIO $ putStrLn . pp $ e
-    liftIO $ putStrLn . ("⇒⇒ " ++) . pp . last $ es
+    if len >= n
+       then liftIO $ putStrLn "⇒ ..."
+       else return ()
+    liftIO $ mapM_ (putStrLn . ("⇒ " ++) . pp) $ drop (len - n) es
     if not (null cont)
-        then liftIO $ putStrLn $ (show . length $ es) ++ " steps, and more..."
-        else liftIO $ putStrLn $ (show . length $ es) ++ " steps, done."
+       then liftIO $ putStrLn $ (show len) ++ " steps, and more..."
+       else liftIO $ putStrLn $ (show len) ++ " steps, done."
     liftIO $ putStrLn ""
 
 runInfo :: Ident -> Mogul ()
@@ -142,10 +157,12 @@ parseCommand :: Text -> Either ParseError Command
 parseCommand src = let result = parse cmd "stdin" src
                    in  s <$> result
   where
-    s (CmdEvals e)    = CmdEvals $ subst e
-    s (CmdEvalLast e) = CmdEvalLast $ subst e
-    s (CmdStore x f)  = CmdStore x $ substF f
-    s command         = command
+    s (CmdEvals e)      = CmdEvals $ subst e
+    s (CmdEvalLast e)   = CmdEvalLast $ subst e
+    s (CmdEvalHead n e) = CmdEvalHead n $ subst e
+    s (CmdEvalTail n e) = CmdEvalTail n $ subst e
+    s (CmdStore x f)    = CmdStore x $ substF f
+    s command           = command
 
 cmd :: Parser Command
 cmd = try cmdEvalLast
@@ -154,6 +171,8 @@ cmd = try cmdEvalLast
       <|> try cmdShowContext
       <|> try cmdQuit
       <|> try cmdStore
+      <|> try cmdEvalHead
+      <|> try cmdEvalTail
       <|> try cmdEvals
       <|> cmdNull
 
@@ -171,6 +190,49 @@ cmdEvalLast = do
     e <- token expr
     eof
     return $ CmdEvalLast e
+
+optHead1 :: Parser Int
+optHead1 = do
+    char ':'
+    ds <- many1 digit
+    return $ read ds
+
+optHead2 :: Parser Int
+optHead2 = do
+    try (string ":head") <|> string ":h"
+    spaces
+    ds <- many1 digit
+    return $ read ds
+
+cmdEvalHead :: Parser Command
+cmdEvalHead = do
+    spaces
+    n <- try optHead1 <|> optHead2
+    e <- token expr
+    eof
+    return $ CmdEvalHead n e
+
+optTail1 :: Parser Int
+optTail1 = do
+    string ":-"
+    ds <- many1 digit
+    return $ read ds
+
+optTail2 :: Parser Int
+optTail2 = do
+    try (string ":tail") <|> string ":t"
+    spaces
+    ds <- many1 digit
+    return $ read ds
+
+cmdEvalTail :: Parser Command
+cmdEvalTail = do
+    spaces
+    n <- try optTail1 <|> optTail2
+    e <- token expr
+    eof
+    return $ CmdEvalTail n e
+
 
 cmdInfo :: Parser Command
 cmdInfo = do
