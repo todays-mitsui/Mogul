@@ -1,8 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Data
-    (
-      Ident(..)
+    ( Ident(..)
     , isUniIdent
     , isLargeIdent
 
@@ -18,8 +17,13 @@ module Data
     , emptyContext
 
     , s, k, i
+
+    , Command(..)
+    , Mogul
     ) where
 
+
+import Control.Monad.State.Lazy (StateT)
 import Data.Text                  (Text)
 import qualified Data.Text     as T
 import Data.Char                  (isLower)
@@ -95,3 +99,23 @@ k = var "k"
 
 s :: Expr
 s = var "s"
+
+--------------------------------------------------------------------------------
+
+data Command = CmdEvals    Expr
+             | CmdEvalLast Expr
+             | CmdEvalHead !Int   Expr
+             | CmdEvalTail !Int   Expr
+             | CmdInfo     !Ident
+             | CmdStore    !Ident Func
+             | CmdDelete   !Ident
+             | CmdShowContext
+             -- | CmdLoadContext FilePath
+             -- | CmdSaveContext FilePath
+             -- | CmdUnlambda Expr
+             -- | CmdHelp
+             | CmdNull
+             | CmdQuit
+  deriving (Eq, Show)
+
+type Mogul a = StateT Context IO a

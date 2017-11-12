@@ -11,7 +11,7 @@ import Test.Hspec
 import qualified Data.Text     as T
 
 import Data
-import Parser (parseExpr, parseContext)
+import Parser.Expr (parseExpr, parseContext)
 import Eval (eval)
 
 

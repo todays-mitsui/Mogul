@@ -18,7 +18,8 @@ library
   exposed-modules:     Lib
                      , Data
                      , Unlambda
-                     , Parser
+                     , Parser.Expr
+                     , Parser.Command
                      , PPrint
                      , Focus
                      , Eval

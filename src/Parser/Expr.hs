@@ -1,10 +1,11 @@
-module Parser
+module Parser.Expr
     ( parseExpr
     , parseContext
     , subst, substF
     , expr
     , ident
-    , def ) where
+    , def
+    ) where
 
 
 import Control.Monad (void)

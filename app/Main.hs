@@ -16,7 +16,7 @@ import Text.Parsec                (parse)
 import Data
 import Eval
 
-import Parser      (parseExpr, parseContext)
+import Parser.Expr (parseExpr, parseContext)
 import PPrint      (pp)
 
 import CUI         (Mogul, initCUI, getCommand, runCommand)

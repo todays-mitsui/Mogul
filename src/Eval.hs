@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Eval (
-      evals
+module Eval
+    ( evals
     , eval
     ) where
 

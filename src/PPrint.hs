@@ -2,8 +2,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 module PPrint
-    (
-      pp
+    ( pp
     ) where
 
 
