@@ -19,8 +19,8 @@ import qualified Data.Text as T
 import qualified Data.Map.Lazy as Map
 
 import Data
-import Parser hiding (context, ident)
-import qualified Parser as P
+import Parser.Expr hiding (context, ident)
+import qualified Parser.Expr as P
 
 
 instance Eq ParseError where

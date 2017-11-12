@@ -2,55 +2,67 @@
 
 module Main where
 
-import System.IO                 (IOMode (..), openFile, hSetEncoding, utf8)
+import Control.Monad.State.Lazy   (liftIO, execStateT)
+
+import System.Directory           (getCurrentDirectory)
+import System.IO                  (IOMode (..), openFile, hSetEncoding, hFlush, stdout, utf8)
 import qualified Data.Text     as T
 import qualified Data.Text.IO  as T
-import Data.Functor ((<$>))
-import Control.Monad             (forever)
-import Text.Parsec (parse)
+import Data.Functor               ((<$>))
+import Data.List                  (splitAt)
+import Control.Monad              (forever, void)
+import Text.Parsec                (parse)
 
 import Data
--- import Expr
 import Eval
 
-import Parser      (parseExpr, parseContext)
+import Parser.Expr (parseExpr, parseContext)
 import PPrint      (pp)
--- import Focus       (goRoot)
+
+import CUI         (Mogul, initCUI, getCommand, runCommand)
 
 
 main :: IO ()
--- main = case parse def "" "```sxyz = ``xz`yz" of
---             Left  parseError -> putStrLn . show $ parseError
---             Right parsedExpr -> putStrLn . pp $ parsedExpr
-main = do
-  c <- loadContext "default.context"
-  putStrLn . pp $ c
-  putStrLn $ show skk
-  -- mapM_ (putStrLn . show) . eval c [] $ skk
-  -- mapM_ (putStrLn . pp . uncrumb) . eval c [] $ skk
-  -- forever $ do
-  --   putStrLn "Input Lambda term:"
-  --   putStr "> "
-  --   input <- TIO.getLine
-  --   case parse expr "" input of
-  --     Left  parseError -> putStrLn . show $ parseError
-  --     Right e          -> do putStrLn . pp $ e
-  --                            mapM_ (putStrLn . pp) (reverse $ evals c e)
-  --   putStrLn ""
+main = void $ execStateT main' emptyContext
 
-  -- putStrLn ""
-  -- let Right x = skk
-  -- putStrLn . pp $ x
-  -- mapM_ (putStrLn . pp) (reverse $ evals c x)
+main' :: Mogul ()
+main' = do
+    initCUI
+    forever $ do
+        errOrCmd <- getCommand
+        case errOrCmd of
+            Left  parseError -> liftIO $ putStrLn . show $ parseError
+            Right command    -> runCommand command
 
-Right skk = parseExpr "``ik``^x.^y.`yxab"
+            -- main :: IO ()
+-- main = do
+--   cd      <- getCurrentDirectory
+--   context <- loadContext $ cd ++ "/default.context"
+--   putStrLn "Mogul v0.1.0"
+--   putStrLn ""
+--   putStrLn . pp $ context
+--   forever $ do
+--     putStr "> "
+--     hFlush stdout
+--     input <- T.getLine
+--     case parseExpr input of
+--          Left  parseError -> putStrLn . show $ parseError
+--          Right e          ->
+--            do putStrLn . pp $ e
+--               let (es, cont) = splitAt 500 $ evals context e
+--               mapM_ (putStrLn . ("⇒ " ++) . pp) es
+--               if not (null cont)
+--                  then putStrLn $ (show . length $ es) ++ " steps, and more..."
+--                  else putStrLn $ (show . length $ es) ++ " steps, done."
+--     putStrLn ""
 
-loadContext :: String -> IO Context
-loadContext filepath = do
-  h <- openFile filepath ReadMode
-  hSetEncoding h utf8
-  eitherContext <- parseContext <$> T.hGetContents h
-  case eitherContext of
-       Left  parseError -> do putStrLn . show $ parseError
-                              return emptyContext
-       Right context    -> return context
+
+-- loadContext :: String -> IO Context
+-- loadContext filepath = do
+--   h <- openFile filepath ReadMode
+--   hSetEncoding h utf8
+--   eitherContext <- parseContext <$> T.hGetContents h
+--   case eitherContext of
+--        Left  parseError -> do putStrLn . show $ parseError
+--                               return emptyContext
+--        Right context    -> return context

@@ -18,15 +18,18 @@ library
   exposed-modules:     Lib
                      , Data
                      , Unlambda
-                     , Parser
+                     , Parser.Expr
+                     , Parser.Command
                      , PPrint
                      , Focus
                      , Eval
+                     , CUI
   build-depends:       base >= 4.7 && < 5
                      , text
                      , containers
                      , parsec3
                      , mtl
+                     , directory
   default-language:    Haskell2010
 
 executable mogul
@@ -39,13 +42,15 @@ executable mogul
                      , containers
                      , parsec3
                      , mtl
+                     , directory
   default-language:    Haskell2010
 
 test-suite mogul-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  other-modules:       ParserSpec
+  other-modules:       DataSpec
+                     , ParserSpec
                      , UnlambdaSpec
                      , FocusSpec
                      , PPrintSpec
