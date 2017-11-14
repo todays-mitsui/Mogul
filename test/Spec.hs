@@ -34,3 +34,5 @@ main = hspec $ do
   specPPrintPp
 
   specEvalEval
+  specEvalEvalsPlus
+

@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Eval
-    ( evals
-    , eval
+    ( evals, eval
+    , evalsPlus, evalPlus
+    , Nav(..)
     ) where
 
 
@@ -31,6 +32,23 @@ eval context e = map uncrumb $ reduce context [] e
 
 --------------------------------------------------------------------------------
 
+evalsPlus :: Context -> Expr -> [(Expr, [Nav])]
+evalsPlus context e = shift e [] $ evalsPlus' context e
+
+shift :: a -> b -> [(a, b)] -> [(a, b)]
+shift z w []             = [(z, w)]
+shift z w ((x, y):pairs) = (z, y) : shift x w pairs
+
+evalsPlus' :: Context -> Expr -> [(Expr, [Nav])]
+evalsPlus' context e = case evalPlus context e of
+                            []             -> []
+                            ((e', ns) : _) -> (e', ns) : evalsPlus' context e'
+
+evalPlus :: Context -> Expr -> [(Expr, [Nav])]
+evalPlus context e = [ (e'', ns) | (e', bcs) <- reduce context [] e, let e'' = uncrumb (e', bcs), let ns = navs bcs ]
+
+--------------------------------------------------------------------------------
+
 -- | 構文木を辿っていくとき、着目していない側の部分木を保持しておく構造体
 -- 着目している部分木と着目していない部分木で構文木全体を常に表現できるように保つ
 --
@@ -53,6 +71,17 @@ uncrumb :: (Expr, [BreadCrumb]) -> Expr
 uncrumb (e, [])                = e
 uncrumb (e, LeftExpr el : bcs) = uncrumb (el :$ e, bcs)
 uncrumb (e, Args es     : bcs) = uncrumb (foldl (:$) e es, bcs)
+
+
+data Nav = NavLeft | NavRight
+  deriving (Eq, Show)
+
+navs :: [BreadCrumb] -> [Nav]
+navs = concatMap crumb2navs . reverse
+
+crumb2navs :: BreadCrumb -> [Nav]
+crumb2navs (LeftExpr _) = [NavRight]
+crumb2navs (Args es)    = map (const NavLeft) es
 
 --------------------------------------------------------------------------------
 

@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module EvalSpec (
-  specEvalEval
-) where
+module EvalSpec
+  ( specEvalEval
+  , specEvalEvalsPlus
+  ) where
 
 
 import Test.Hspec
@@ -12,7 +13,7 @@ import qualified Data.Text     as T
 
 import Data
 import Parser.Expr (parseExpr, parseContext)
-import Eval (eval)
+import Eval (eval, evals, evalPlus, evalsPlus, Nav(..))
 
 
 Right c = parseContext . T.unlines $ [
@@ -57,3 +58,15 @@ specEvalEval = describe "Eval.eval" $ do
 
         let Right e2 = parseExpr "```xy`yz`zx"
         eval c e2 `shouldBe` []
+
+specEvalEvalsPlus = describe "Eval.evalsPlus" $ do
+    context "Expr has β-redex" $
+      it "return" $ do
+        let Right e1 = parseExpr "```s`ik`ik`ix"
+        evalsPlus c e1 `shouldBe` [
+            (com "s" :$ (com "i" :$ com "k") :$ (com "i" :$ com "k") :$ (com "i" :$ com "x")           , []                )
+          , (com "i" :$ com "k" :$ (com "i" :$ com "x") :$ (com "i" :$ com "k" :$ (com "i" :$ com "x")), [NavLeft, NavLeft])
+          , (com "k" :$ (com "i" :$ com "x") :$ (com "i" :$ com "k" :$ (com "i" :$ com "x"))           , []                )
+          , (com "i" :$ com "x"                                                                        , []                )
+          , (com "x"                                                                                   , []                )
+          ]
