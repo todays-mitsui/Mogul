@@ -10,7 +10,6 @@ import Data.Monoid            ((<>))
 import qualified Data.Text as T
 import Data.Text              (Text, pack, unpack)
 import Data.Map.Lazy          (foldrWithKey)
-import Data.Tree
 
 import Data
 
@@ -82,17 +81,17 @@ symbol v@(Ident x)
 --------------------------------------------------------------------------------
 
 data Unit = USymbol Text
-          | ULambda Text Tree
+          | ULambda Text (Tree Unit)
   deriving (Eq, Show)
 
 data Tree a = Tip a
-            | Bin Tree Tree
+            | Bin (Tree a) (Tree a)
   deriving (Eq, Show)
 
 tree :: Expr -> Tree Unit
 tree (Var (Ident x)) = Tip $ USymbol x
 tree (Com (Ident x)) = Tip $ USymbol x
-tree (x :^ e)        = Tip $ ULambda x (tree e)
+tree (Ident x :^ e)  = Tip $ ULambda x (tree e)
 tree (el :$ er)      = Bin (tree el) (tree er)
 
 -- tokens :: Tree Unit -> [Token]
