@@ -33,11 +33,11 @@ eval context e = map uncrumb $ reduce context [] e
 --------------------------------------------------------------------------------
 
 evalsPlus :: Context -> Expr -> [(Expr, [Nav])]
-evalsPlus context e = shift e [] $ evalsPlus' context e
+evalsPlus context e = shift e $ evalsPlus' context e
 
-shift :: a -> b -> [(a, b)] -> [(a, b)]
-shift z w []             = [(z, w)]
-shift z w ((x, y):pairs) = (z, y) : shift x w pairs
+shift :: Expr -> [(Expr, [Nav])] -> [(Expr, [Nav])]
+shift e []             = [(e, [])]
+shift e ((e', ns):pairs) = (e, ns) : shift e' pairs
 
 evalsPlus' :: Context -> Expr -> [(Expr, [Nav])]
 evalsPlus' context e = case evalPlus context e of
