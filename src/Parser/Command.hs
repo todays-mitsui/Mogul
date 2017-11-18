@@ -54,14 +54,19 @@ cmdEvals = do
 
 --------------------------------------------------------------------------------
 
-optLast :: Parser ()
-optLast = void $ try (string ":last") <|> string ":l" <|> string "!"
+optLast1 :: Parser ()
+optLast1 = do
+    try (string ":last") <|> string ":l"
+    space
+    return ()
+
+optLast2 :: Parser ()
+optLast2 = void $ string "!"
 
 cmdEvalLast :: Parser Command
 cmdEvalLast = do
     spaces
-    optLast
-    many1 space
+    try optLast1 <|> optLast2
     e <- token expr
     eof
     return $ CmdEvalLast e
@@ -114,14 +119,18 @@ cmdEvalTail = do
 
 --------------------------------------------------------------------------------
 
-optInfo :: Parser ()
-optInfo = void $ try (string ":info") <|> string ":i" <|> string "?"
+optInfo1 :: Parser ()
+optInfo1 = do
+    try (string ":info") <|> string ":i"
+    space
+    return ()
+
+optInfo2 :: Parser ()
+optInfo2 = void $ string "?"
 
 cmdInfo :: Parser Command
 cmdInfo = do
-    spaces
-    optInfo
-    many1 space
+    token $ try optInfo1 <|> optInfo2
     x <- token ident
     eof
     return $ CmdInfo x
