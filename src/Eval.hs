@@ -3,7 +3,6 @@
 module Eval
     ( evals, eval
     , evalsPlus, evalPlus
-    , Nav(..)
     ) where
 
 
@@ -72,9 +71,6 @@ uncrumb (e, [])                = e
 uncrumb (e, LeftExpr el : bcs) = uncrumb (el :$ e, bcs)
 uncrumb (e, Args es     : bcs) = uncrumb (foldl (:$) e es, bcs)
 
-
-data Nav = NavLeft | NavRight
-  deriving (Eq, Show)
 
 navs :: [BreadCrumb] -> [Nav]
 navs = concatMap crumb2navs . reverse

@@ -24,12 +24,15 @@ library
                      , Focus
                      , Eval
                      , CUI
+                     , Json
   build-depends:       base >= 4.7 && < 5
                      , text
+                     , bytestring
                      , containers
                      , parsec3
                      , mtl
                      , directory
+                     , aeson
   default-language:    Haskell2010
 
 executable mogul
@@ -55,10 +58,12 @@ test-suite mogul-test
                      , FocusSpec
                      , PPrintSpec
                      , EvalSpec
+                     , JsonSpec
   build-depends:       base
                      , hspec
                      , mogul
                      , text
+                     , bytestring
                      , containers
                      , parsec3
                      , mtl

@@ -19,6 +19,9 @@ module Data
 
     , Command(..)
     , Mogul
+
+    , Nav(..)
+    , Transition
     ) where
 
 
@@ -98,38 +101,6 @@ s = com "s"
 
 --------------------------------------------------------------------------------
 
-data ExtraExpr = ExVar    !Ident (Maybe Int)
-               | ExLambda !Ident Expr
-               | ExApply  Expr   Expr Bool
-               | ExCom    !Ident (Maybe Func)
-  deriving (Eq, Show)
-
-addMetaInfo :: Context -> Counter -> Expr -> ExtraExpr
-addMetaInfo context counter (Var x)
-  | x `Set.member` fvs = ExVar x (Just 0)
-  | otherwise          = ExVar x Nothing
-  where
-    fvs = freeVars counter
-addMetaInfo context counter (Com x)    = ExCom x (x `Map.lookup` context)
-addMetaInfo context counter (el :$ er) = ExApply el er False
-
-data Counter = Counter {
-      argCount    :: Int
-    , freeVars    :: Set Ident
-    , boundedVars :: Set Ident
-    } deriving (Eq, Show)
-
--- freeVars :: Expr -> Set Ident
--- freeVars = freeVars' Set.empty
-
--- freeVars' :: Set Ident -> Expr -> Set Ident
--- freeVars' fvs (Com x)    = x `insert` fvs
--- freeVars' fvs (Var _)    = fvs
--- freeVars' fvs (el :$ er) = freeVars' fvs el `union` freeVars' fvs er
--- freeVars' fvs (_ :^ e)   = freeVars' fvs e
-
---------------------------------------------------------------------------------
-
 data Command = CmdEvals    Expr
              | CmdEvalLast Expr
              | CmdEvalHead !Int   Expr
@@ -147,3 +118,17 @@ data Command = CmdEvals    Expr
   deriving (Eq, Show)
 
 type Mogul a = StateT Context IO a
+
+--------------------------------------------------------------------------------
+
+data Nav = NavLeft
+         | NavRight
+  deriving (Eq, Show)
+
+data Transition = Transition {
+      _context   :: Context
+    , _request   :: Expr
+    , _transiton :: [(Expr, [Nav])]
+    , _last      :: Expr
+    , _continue  :: Bool
+    } deriving (Eq, Show)

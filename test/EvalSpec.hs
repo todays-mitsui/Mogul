@@ -13,7 +13,7 @@ import qualified Data.Text     as T
 
 import Data
 import Parser.Expr (parseExpr, parseContext)
-import Eval (eval, evals, evalPlus, evalsPlus, Nav(..))
+import Eval (eval, evals, evalPlus, evalsPlus)
 
 
 Right c = parseContext . T.unlines $ [
