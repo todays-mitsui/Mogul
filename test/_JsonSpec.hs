@@ -50,7 +50,7 @@ specJsonAddMetaInfo = describe "Json.addMetaInfo" $ do
         let Right e = parseExpr "`^s.s y"
         addMetaInfo c (Just []) e `shouldBe` ExApply (ExLambda (Ident "s") (ExVar (Ident "s") $ Just 0)) (ExCom (Ident "y") Nothing) True
 
-specJsonJsonEncode = describe "Json.jsonEncode" $ do
+specJsonJsonEncode = describe "Json.encode" $ do
     context "```skkx" $
       it "return json string" $ do
         let Right e = parseExpr "```skkx"

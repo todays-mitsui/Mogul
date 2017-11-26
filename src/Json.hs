@@ -1,36 +1,41 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Json
-    ( jsonEncode
-    , ExtraExpr(..)
-    , addMetaInfo
-    ) where
+module Json where
 
 
-import Data.ByteString.Lazy.Internal (ByteString)
+import Data.ByteString.Lazy       (ByteString)
 import Data.Text                  (Text)
 import Data.Set                   (Set, member, empty, singleton, union)
 import qualified Data.Set      as Set
 import qualified Data.Map.Lazy as Map
+import Data.Map.Lazy              (mapKeysMonotonic)
+import Data.Maybe                 (listToMaybe)
 -- import Control.Lens hiding (Context)
 import Data.Aeson
 
 import Data
 
-jsonEncode :: Context -> [Nav] -> Expr -> ByteString
-jsonEncode context navs e = let e' = addMetaInfo context (Just navs) e
-                            in  encode e'
+-- jsonEncode :: Context -> [Nav] -> Expr -> ByteString
+-- jsonEncode context navs e = let e' = addMetaInfo context (Just navs) e
+--                             in  encode e'
 
 --------------------------------------------------------------------------------
 
-data ExtraExpr = ExVar    !Ident    (Maybe Int)
-               | ExLambda !Ident    ExtraExpr
-               | ExApply  ExtraExpr ExtraExpr Bool
-               | ExCom    !Ident    (Maybe Func)
-  deriving (Eq, Show)
-
---------------------------------------------------------------------------------
+instance ToJSON Transition where
+    toJSON = do
+        context    <- _context
+        request    <- _request
+        len        <- _ellipsis
+        (es, cont) <- splitAt len . _transition
+        return $ object [
+              "context"    .= mapKeysMonotonic unIdent context
+            , "request"    .= request
+            , "transition" .= es
+            , "next"       .= listToMaybe cont
+            ]
+      where
+        unIdent (Ident x) = x
 
 instance ToJSON ExtraExpr where
     toJSON (ExVar x i) = object [
@@ -85,33 +90,3 @@ instance ToJSON Expr where
 instance ToJSON Ident where
     toJSON (Ident x) = toJSON x
 
---------------------------------------------------------------------------------
-
-addMetaInfo :: Context -> Maybe [Nav] -> Expr -> ExtraExpr
-addMetaInfo context _ (Var x)
-    | x `Map.member` context = ExVar x (Just 0)
-    | otherwise              = ExVar x Nothing
-
-addMetaInfo context _ (Com x) = ExCom x $ x `Map.lookup` context
-
-addMetaInfo context navs@(Just (NavLeft:_)) (el :$ er) =
-    let el' = addMetaInfo context (fmap tail navs) el
-        er' = addMetaInfo context Nothing          er
-    in  ExApply el' er' False
-
-addMetaInfo context navs@(Just (NavRight:_)) (el :$ er) =
-    let el' = addMetaInfo context Nothing          el
-        er' = addMetaInfo context (fmap tail navs) er
-    in  ExApply el' er' False
-
-addMetaInfo context navs@(Just []) (el :$ er) =
-    let el' = addMetaInfo context navs  el
-        er' = addMetaInfo context Nothing er
-    in  ExApply el' er' True
-
-addMetaInfo context navs@Nothing (el :$ er) =
-    let el' = addMetaInfo context Nothing el
-        er' = addMetaInfo context Nothing er
-    in  ExApply el' er' False
-
-addMetaInfo context _ (x :^ e) = ExLambda x $ addMetaInfo context Nothing e

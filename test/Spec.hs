@@ -9,7 +9,6 @@ import ParserSpec
 -- import FocusSpec
 import PPrintSpec
 import EvalSpec
-import JsonSpec
 
 
 main :: IO ()
@@ -36,7 +35,4 @@ main = hspec $ do
 
   specEvalEval
   specEvalEvalsPlus
-
-  specJsonAddMetaInfo
-  specJsonJsonEncode
-
+  specEvalTransition

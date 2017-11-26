@@ -1,19 +1,24 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module EvalSpec
-  ( specEvalEval
-  , specEvalEvalsPlus
-  ) where
+    ( specEvalEval
+    , specEvalEvalsPlus
+    , specEvalTransition
+    ) where
 
 
 import Test.Hspec
 -- import Control.Exception (evaluate)
 
-import qualified Data.Text     as T
+import qualified Data.Text            as T
+import qualified Data.ByteString.Lazy as BS
+import Data.ByteString.Lazy              (ByteString)
+import Data.Aeson (encode)
 
 import Data
+import Json
 import Parser.Expr (parseExpr, parseContext)
-import Eval (eval, evals, evalPlus, evalsPlus)
+import Eval (eval, evals, transition, evalPlus, evalsPlus)
 
 
 Right c = parseContext . T.unlines $ [
@@ -70,3 +75,19 @@ specEvalEvalsPlus = describe "Eval.evalsPlus" $ do
           , (com "i" :$ com "x"                                                                        , []                )
           , (com "x"                                                                                   , []                )
           ]
+
+specEvalTransition = describe "Eval.transition" $ do
+    it "return eval transition" $ do
+        let Right e = parseExpr "```s`ik`ik`ix"
+        transition c e `shouldBe`
+            Transition {
+                  _context    = c
+                , _request    = e
+                , _transition = []
+                , _ellipsis   = 100
+                }
+
+    it "can encode to json" $ do
+        let Right e = parseExpr "```s`ik`ik`ix"
+            t       = transition c e
+        encode t `shouldBe` ""

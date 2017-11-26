@@ -21,7 +21,8 @@ module Data
     , Mogul
 
     , Nav(..)
-    , Transition
+    , ExtraExpr(..)
+    , Transition(..)
     ) where
 
 
@@ -125,10 +126,17 @@ data Nav = NavLeft
          | NavRight
   deriving (Eq, Show)
 
+data ExtraExpr = ExVar    !Ident    (Maybe Int)
+               | ExLambda !Ident    ExtraExpr
+               | ExApply  ExtraExpr ExtraExpr Bool
+               | ExCom    !Ident    (Maybe Func)
+  deriving (Eq, Show)
+
+--------------------------------------------------------------------------------
+
 data Transition = Transition {
-      _context   :: Context
-    , _request   :: Expr
-    , _transiton :: [(Expr, [Nav])]
-    , _last      :: Expr
-    , _continue  :: Bool
+      _context    :: Context
+    , _request    :: Expr
+    , _transition :: [ExtraExpr]
+    , _ellipsis   :: Int
     } deriving (Eq, Show)

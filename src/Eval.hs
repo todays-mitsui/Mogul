@@ -2,6 +2,7 @@
 
 module Eval
     ( evals, eval
+    , transition
     , evalsPlus, evalPlus
     ) where
 
@@ -30,6 +31,16 @@ eval :: Context -> Expr -> [Expr]
 eval context e = map uncrumb $ reduce context [] e
 
 --------------------------------------------------------------------------------
+
+transition :: Context -> Expr -> Transition
+transition context e =
+    let es = evalsPlus context e
+    in  Transition {
+              _context    = context
+            , _request    = e
+            , _transition = [ addMetaInfo context (Just navs) e' | (e', navs) <- es ]
+            , _ellipsis   = 100
+            }
 
 evalsPlus :: Context -> Expr -> [(Expr, [Nav])]
 evalsPlus context e = shift e $ evalsPlus' context e
@@ -120,3 +131,35 @@ rewrite x e (el :$ er)  = rewrite x e el :$ rewrite x e er
 rewrite x e l@(y :^ e')
   | x == y              = l
   | otherwise           = y :^ rewrite x e e'
+
+
+--------------------------------------------------------------------------------
+
+addMetaInfo :: Context -> Maybe [Nav] -> Expr -> ExtraExpr
+addMetaInfo context _ (Var x)
+    | x `Map.member` context = ExVar x (Just 0)
+    | otherwise              = ExVar x Nothing
+
+addMetaInfo context _ (Com x) = ExCom x $ x `Map.lookup` context
+
+addMetaInfo context navs@(Just (NavLeft:_)) (el :$ er) =
+    let el' = addMetaInfo context (fmap tail navs) el
+        er' = addMetaInfo context Nothing          er
+    in  ExApply el' er' False
+
+addMetaInfo context navs@(Just (NavRight:_)) (el :$ er) =
+    let el' = addMetaInfo context Nothing          el
+        er' = addMetaInfo context (fmap tail navs) er
+    in  ExApply el' er' False
+
+addMetaInfo context navs@(Just []) (el :$ er) =
+    let el' = addMetaInfo context navs  el
+        er' = addMetaInfo context Nothing er
+    in  ExApply el' er' True
+
+addMetaInfo context navs@Nothing (el :$ er) =
+    let el' = addMetaInfo context Nothing el
+        er' = addMetaInfo context Nothing er
+    in  ExApply el' er' False
+
+addMetaInfo context _ (x :^ e) = ExLambda x $ addMetaInfo context Nothing e

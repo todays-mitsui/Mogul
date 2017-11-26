@@ -12,6 +12,7 @@ import Data.Functor               ((<$>))
 import Data.List                  (splitAt)
 import Control.Monad              (forever, void)
 import Text.Parsec                (parse)
+import Web.Scotty
 
 import Data
 import Eval
@@ -20,10 +21,12 @@ import Parser.Expr (parseExpr, parseContext)
 import PPrint      (pp)
 
 import CUI         (Mogul, initCUI, getCommand, runCommand)
+import API         (api)
 
 
 main :: IO ()
-main = void $ execStateT main' emptyContext
+-- main = void $ execStateT main' emptyContext
+main = scotty 8080 api
 
 main' :: Mogul ()
 main' = do
