@@ -1,8 +1,8 @@
 # Mogul
 
-skiコンビネータ−をステップ評価するインタプリタです。
+skiコンビネーターをステップ実行する評価器です。
 
-## セットアップ
+## セットアップ & 実行
 
 [Stack](https://docs.haskellstack.org/en/stable/README/) コマンドが使える状態で以下のコマンドを実行すれば多分セットアップできます。
 
@@ -13,7 +13,7 @@ $ stack setup
 $ stack build
 $
 $ #実行
-$ stack exec mogul-exe
+$ stack exec mogul
 ```
 
 ## 文法

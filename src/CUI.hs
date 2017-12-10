@@ -29,9 +29,9 @@ import Eval (evals)
 initCUI :: Mogul ()
 initCUI = do
     cd      <- liftIO $ getCurrentDirectory
-    context <- liftIO $ loadContext $ cd ++ "/default.context"
+    context <- liftIO $ loadContext $ cd ++ "/default.mgl"
     put context
-    liftIO $ putStrLn "Mogul v0.0.1.0"
+    liftIO $ putStrLn "Mogul v0.1.0.0"
     liftIO $ putStrLn ""
 
 loadContext :: String -> IO Context
