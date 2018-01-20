@@ -15,7 +15,7 @@ import qualified Data.Text.IO as T
 import Text.Parsec hiding (token)
 import Text.Parsec.Text (Parser)
 
-import Data
+import Data.Command (Command(..))
 import Parser.Expr (subst, substF, expr, ident, def)
 
 

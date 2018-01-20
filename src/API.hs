@@ -19,10 +19,9 @@ import qualified Data.Text.IO  as T
 import Data.Text (Text)
 -- import Data.Map.Lazy (lookup)
 import System.Directory (getCurrentDirectory)
-import Data (Context, emptyContext)
+import Data.Context (Context, emptyContext)
 import Parser.Expr (parseExpr, parseContext)
 import Eval (evals, transition)
-import Json
 
 
 api = do

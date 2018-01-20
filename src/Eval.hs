@@ -15,7 +15,13 @@ import Data.Map.Lazy              (Map, (!), member, notMember)
 import qualified Data.Map.Lazy as Map
 import Control.Monad.State.Lazy
 
-import Data
+import Data.Ident      (Ident)
+import Data.Expr       (Expr(..))
+import Data.Func       (Func(..), arity)
+import Data.Context    (Context)
+import Data.Nav        (Nav(..))
+import Data.ExtraExpr
+import Data.Transition
 
 
 -- | λ式を段階的に簡約して、すべてのステップの式を返す
@@ -35,12 +41,8 @@ eval context e = map uncrumb $ reduce context [] e
 transition :: Context -> Expr -> Transition
 transition context e =
     let es = evalsPlus context e
-    in  Transition {
-              _context    = context
-            , _request    = e
-            , _transition = [ addMetaInfo context (Just navs) e' | (e', navs) <- es ]
-            , _ellipsis   = 100
-            }
+        transition = [ addMetaInfo context (Just navs) e' | (e', navs) <- es ]
+    in  mkTransition context e transition 100
 
 evalsPlus :: Context -> Expr -> [(Expr, [Nav])]
 evalsPlus context e = shift e $ evalsPlus' context e

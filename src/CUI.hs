@@ -19,7 +19,12 @@ import qualified Data.Text    as T
 import qualified Data.Text.IO as T
 import Text.Parsec (ParseError)
 
-import Data
+import Data.Ident     (Ident)
+import Data.Expr      (Expr)
+import Data.Func      (Func)
+import Data.Context   (Context, emptyContext)
+import Data.Command   (Command(..))
+import Data.Mogul     (Mogul)
 import Parser.Expr    (parseContext)
 import Parser.Command (parseCommand)
 import PPrint (pp)

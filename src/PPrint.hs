@@ -11,7 +11,10 @@ import qualified Data.Text as T
 import Data.Text              (Text, pack, unpack)
 import Data.Map.Lazy          (foldrWithKey)
 
-import Data
+import Data.Ident   (Ident(..), isUniIdent)
+import Data.Expr    (Expr(..))
+import Data.Func    (Func, body)
+import Data.Context (Context)
 
 
 class PPrintable a where

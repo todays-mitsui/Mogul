@@ -16,16 +16,22 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Lib
-                     , Data
+                     , Data.Ident
+                     , Data.Expr
+                     , Data.Context
+                     , Data.Func
+                     , Data.Nav
+                     , Data.ExtraExpr
+                     , Data.Transition
+                     , Data.Command
+                     , Data.Mogul
                      , Unlambda
                      , Parser.Expr
                      , Parser.Command
                      , PPrint
-                     , Focus
                      , Eval
                      , CUI
                      , API
-                     , Json
   build-depends:       base >= 4.7 && < 5
                      , text
                      , bytestring

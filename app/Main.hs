@@ -14,7 +14,7 @@ import Control.Monad              (forever, void)
 import Text.Parsec                (parse)
 import Web.Scotty
 
-import Data
+import Data.Context (Context, emptyContext)
 import Eval
 
 import Parser.Expr (parseExpr, parseContext)

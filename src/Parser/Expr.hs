@@ -21,8 +21,10 @@ import Data.Text (Text, pack, singleton)
 import Text.Parsec hiding (token)
 import Text.Parsec.Text
 
-import Data (Ident(..), Expr(..), Func(..), Context)
-import qualified Data as D
+import Data.Ident   (Ident(..))
+import Data.Expr    (Expr(..))
+import Data.Func    (Func(..))
+import Data.Context (Context)
 
 
 parseExpr :: Text -> Either ParseError Expr
