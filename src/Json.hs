@@ -38,10 +38,9 @@ instance ToJSON Transition where
         unIdent (Ident x) = x
 
 instance ToJSON ExtraExpr where
-    toJSON (ExVar x i) = object [
+    toJSON (ExVar x) = object [
           "tag"        .= ("Variable" :: Text)
         , "identifier" .= x
-        , "serialnum"  .= i
         ]
     toJSON (ExLambda x e) = object [
           "tag"   .= ("Lambda" :: Text)

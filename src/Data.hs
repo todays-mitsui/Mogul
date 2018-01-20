@@ -126,7 +126,7 @@ data Nav = NavLeft
          | NavRight
   deriving (Eq, Show)
 
-data ExtraExpr = ExVar    !Ident    (Maybe Int)
+data ExtraExpr = ExVar    !Ident
                | ExLambda !Ident    ExtraExpr
                | ExApply  ExtraExpr ExtraExpr Bool
                | ExCom    !Ident    (Maybe Func)

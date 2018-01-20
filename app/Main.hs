@@ -60,12 +60,12 @@ main' = do
 --     putStrLn ""
 
 
--- loadContext :: String -> IO Context
--- loadContext filepath = do
---   h <- openFile filepath ReadMode
---   hSetEncoding h utf8
---   eitherContext <- parseContext <$> T.hGetContents h
---   case eitherContext of
---        Left  parseError -> do putStrLn . show $ parseError
---                               return emptyContext
---        Right context    -> return context
+loadContext :: String -> IO Context
+loadContext filepath = do
+  h <- openFile filepath ReadMode
+  hSetEncoding h utf8
+  eitherContext <- parseContext <$> T.hGetContents h
+  case eitherContext of
+       Left  parseError -> do putStrLn . show $ parseError
+                              return emptyContext
+       Right context    -> return context

@@ -136,9 +136,7 @@ rewrite x e l@(y :^ e')
 --------------------------------------------------------------------------------
 
 addMetaInfo :: Context -> Maybe [Nav] -> Expr -> ExtraExpr
-addMetaInfo context _ (Var x)
-    | x `Map.member` context = ExVar x (Just 0)
-    | otherwise              = ExVar x Nothing
+addMetaInfo context _ (Var x) = ExVar x
 
 addMetaInfo context _ (Com x) = ExCom x $ x `Map.lookup` context
 
