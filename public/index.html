@@ -7,28 +7,27 @@
 
 <title>Mogul</title>
 
-<style>
-</style>
+<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet">
+<link rel="stylesheet" href="/css/base.css">
 </head>
 <body>
-<div class="container"></div>
-<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
-<script>
-$.ajax(
-  'http://localhost:8080/eval/',
-  {
-    method: 'POST',
-    dataType: 'json',
-    data: JSON.stringify({
-      request: 'eval',
-      exprStr: '` ``ski x',
-    }),
-  }
-).then(function(res) {
-  console.info(res);
-}).catch(function(err) {
-  console.info(err);
-});
-</script>
+<h1>Mogul Playgroud.</h1>
+
+<div class="container">
+  <input
+    v-model="srcExprStr"
+    v-on:keyup.enter="submit"
+    autofocus
+  >
+  <div class="result">
+    <ul>
+      <li class="step" v-for="step in transition">
+        <mogul-expr v-bind:expr="step"></mogul-expr>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script src="/js/bundle.js"></script>
 </body>
 </html>

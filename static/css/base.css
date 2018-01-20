@@ -1,0 +1,10 @@
+@charset "UTF-8";
+
+* {
+  box-sizing: border-box;
+}
+
+input,
+.step {
+  font-family: 'Source Code Pro', monospace;
+}

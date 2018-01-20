@@ -26,9 +26,10 @@ import Eval (evals, transition)
 
 api = do
     -- middleware $ staticPolicy $ cssPolicy <|> jsPolicy <|> imgPolicy
+    -- middleware $ staticPolicy $ addBase "static" <> extsPolicy
 
     get "/" $ do
-        file "webui/public/index.html"
+        file "public/index.html"
 
     matchAny "/eval" $ do
         req <- jsonData `rescue` (\_ -> return $ Request "foo" "bar")
@@ -41,11 +42,16 @@ api = do
 
         json $ transition context e
 
-    get "/:word" $ do
-        beam <- param "word"
-        html $ mconcat ["<h1>Scotty, ", beam, " me up!</h1>"]
+    -- get "/:word" $ do
+    --     beam <- param "word"
+    --     html $ mconcat ["<h1>Scotty, ", beam, " me up!</h1>"]
 
-    middleware $ staticPolicy $ addBase "static" <> extsPolicy
+    middleware $ staticPolicy $ addBase "static" <> hasSuffix ".html"
+    middleware $ staticPolicy $ addBase "static" <> hasSuffix ".css"
+    middleware $ staticPolicy $ addBase "static" <> hasSuffix ".js"
+    middleware $ staticPolicy $ addBase "static" <> hasSuffix ".png"
+    middleware $ staticPolicy $ addBase "static" <> hasSuffix ".jpg"
+    middleware $ staticPolicy $ addBase "static" <> hasSuffix ".gif"
 
     notFound (text "404: Not found!")
 
@@ -58,11 +64,11 @@ data Request = Request {
 instance ToJSON Request
 instance FromJSON Request
 
-allowExts = ["html", "css", "js", "png", "jpg", "gif"]
+-- allowExts = ["html", "css", "js", "png", "jpg", "gif"]
 
-extsPolicy = mconcat $ map mkPolicy allowExts
-  where
-    mkPolicy ext = hasSuffix $ "." <> ext
+-- extsPolicy = mconcat $ map mkPolicy allowExts
+--   where
+--     mkPolicy ext = addBase "static" <> hasSuffix ("." ++ ext)
 
 --------------------------------------------------------------------------------
 
